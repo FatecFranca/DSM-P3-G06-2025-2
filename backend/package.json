@@ -1,0 +1,23 @@
+{
+  "name": "backend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon ./src/bin/server.js",
+    "start": "node ./src/bin/server.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.2",
+    "chalk": "^5.4.1",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.1.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.27.0",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.5.3",
+    "prisma": "^6.16.2"
+  },
+  "type": "module"
+}

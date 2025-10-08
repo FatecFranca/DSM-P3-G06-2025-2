@@ -7,9 +7,102 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
+  relationMode = "prisma"
 }
 
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+enum Perfil {
+admin
+usuario
+}
+
+enum StatusSugestao {
+pendente
+aprovada
+rejeitada
+}
+
+
+enum StatusEmprestimo {
+ativo
+concluido
+atrasado
+}
+
+model Usuario {
+id String @id @default(auto()) @map("_id") @db.ObjectId
+nome String
+senha String
+perfil Perfil
+curso_id String? @db.ObjectId
+curso Curso? @relation(fields: [curso_id], references: [id])
+emprestimos Emprestimo[]
+sugestoes SugestaoDeLivro[]
+}
+
+model Curso {
+id String @id @default(auto()) @map("_id") @db.ObjectId
+nome String
+descricao String
+usuarios Usuario[]
+livros Livro[]
+sugestoes SugestaoDeLivro[]
+}
+
+model Livro {
+id String @id @default(auto()) @map("_id") @db.ObjectId
+titulo String
+autor String
+editora String
+edicao String
+materia String
+palavras_chave String[]
+curso_id String? @db.ObjectId
+curso Curso? @relation(fields: [curso_id], references: [id])
+disponibilidade Boolean
+data_cadastro DateTime
+exemplares Exemplar[]
+emprestimos Emprestimo[]
+}
+
+model Exemplar {
+id String @id @default(auto()) @map("_id") @db.ObjectId
+id_livro String @db.ObjectId
+livro Livro @relation(fields: [id_livro], references: [id])
+num_exemplar Int
+emprestimos Emprestimo[]
+}
+
+
+model Emprestimo {
+id String @id @default(auto()) @map("_id") @db.ObjectId
+livro_id String @db.ObjectId
+usuario_id String @db.ObjectId
+exemplarId String @db.ObjectId
+livro Livro @relation(fields: [livro_id], references: [id])
+usuario Usuario @relation(fields: [usuario_id], references: [id])
+exemplar Exemplar @relation(fields: [exemplarId], references: [id])
+data_emprestimo DateTime
+data_devolucao_prevista DateTime
+data_devolucao_real DateTime?
+status StatusEmprestimo
+}
+
+
+model SugestaoDeLivro {
+id String @id @default(auto()) @map("_id") @db.ObjectId
+usuario_id String @db.ObjectId
+livro_sugerido String
+autor String
+editora String
+motivo String
+curso_id String? @db.ObjectId
+status StatusSugestao
+data_sugestao DateTime
+usuario Usuario @relation(fields: [usuario_id], references: [id])
+curso Curso? @relation(fields: [curso_id], references: [id])
 }

@@ -1,15 +1,20 @@
-import "./globals.css";
+import { AppProvider } from "@/contexts/AppContext";
+import { Toaster } from "sonner";
+import "@/styles/globals.css";
 
 export const metadata = {
-  title: "OpenPages - Projeto Integrador",
-  description: "Sistema de gerenciamento de bibliotecas",
+  title: "OpenPages - Projeto Integrador 3° Semestre FATEC Franca",
+  description: "Sistema de  gerenciamento de livros academicos em bibliotecas universitarias",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR">
       <body>
-        {children}
+        <AppProvider>
+          {children}
+          <Toaster position="top-right" />
+        </AppProvider>
       </body>
     </html>
   );

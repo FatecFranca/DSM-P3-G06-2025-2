@@ -8,6 +8,7 @@ import cursoRouter from "./routes/cursoRoutes.js";
 import livroRouter from "./routes/livroRoutes.js";
 import exemplarRouter from "./routes/exemplarRoutes.js";
 import emprestimoRouter from "./routes/emprestimoRoutes.js";
+import sugestaoRouter from "./routes/sugestaoRoutes.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/cursos", cursoRouter);
 app.use("/livros", livroRouter);
 app.use("/exemplares", exemplarRouter);
 app.use("/emprestimos", emprestimoRouter);
+app.use("/sugestoes", sugestaoRouter);
 
 // Middleware para lidar com rotas não encontradas (404)
 app.use((req, res, next) => {

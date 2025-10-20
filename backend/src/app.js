@@ -1,6 +1,7 @@
 import express, { json, urlencoded } from "express";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
+import cors from "cors";
 
 // Importações de Swagger
 import swaggerUi from "swagger-ui-express";
@@ -51,6 +52,14 @@ const swaggerOptions = {
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+// Configuração do CORS
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 app.use(logger("dev"));
 app.use(json());

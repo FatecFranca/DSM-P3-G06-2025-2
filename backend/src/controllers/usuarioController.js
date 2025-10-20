@@ -2,17 +2,18 @@ import prisma from "../database/client.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// Login (Público)
+// Login
 export const login = async (req, res) => {
-  const { nome, senha } = req.body;
+  const { email, senha } = req.body;
   try {
-    const usuario = await prisma.usuario.findUnique({ where: { nome } });
+    const usuario = await prisma.usuario.findUnique({ where: { email } });
     if (!usuario) {
-      return res.status(401).json({ error: "Usuário ou senha inválidos." });
+      return res.status(401).json({ error: "E-mail ou senha inválidos." });
     }
 
-    if (!(await bcrypt.compare(senha, usuario.senha))) {
-      return res.status(401).json({ error: "Usuário ou senha inválidos." });
+    const senhaValida = await bcrypt.compare(senha, usuario.senha);
+    if (!senhaValida) {
+      return res.status(401).json({ error: "E-mail ou senha inválidos." });
     }
 
     const token = jwt.sign(
@@ -24,7 +25,41 @@ export const login = async (req, res) => {
     usuario.senha = undefined;
     res.status(200).json({ usuario, token });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Ocorreu um erro ao tentar fazer login." });
+  }
+};
+
+// Cadastro público de usuário
+export const cadastro = async (req, res) => {
+  const { nome, email, senha, curso_id } = req.body;
+  try {
+    if (!nome || !email || !senha) {
+      return res
+        .status(400)
+        .json({ error: "Nome, e-mail e senha são obrigatórios." });
+    }
+
+    const userExists = await prisma.usuario.findUnique({ where: { email } });
+    if (userExists) {
+      return res.status(400).json({ error: "Este e-mail já está em uso." });
+    }
+
+    const senhaHash = await bcrypt.hash(senha, 8);
+
+    const novoUsuario = await prisma.usuario.create({
+      data: {
+        nome,
+        email,
+        senha: senhaHash,
+        perfil: "usuario", // Perfil é sempre "usuario" no cadastro público
+        curso_id,
+      },
+    });
+
+    novoUsuario.senha = undefined;
+    res.status(201).json(novoUsuario);
+  } catch (error) {
+    res.status(500).json({ error: "Ocorreu um erro ao registrar o usuário." });
   }
 };
 
@@ -32,25 +67,34 @@ export const login = async (req, res) => {
 
 // Criar novo usuário
 export const createUsuario = async (req, res) => {
-  const { nome, senha, perfil, curso_id } = req.body;
+  const { nome, email, senha, perfil, curso_id } = req.body;
   try {
     const senhaHash = await bcrypt.hash(senha, 8);
     const novoUsuario = await prisma.usuario.create({
-      // O perfil 'admin' ou 'usuario' será definido pelo admin no corpo da requisição
       data: { nome, email, senha: senhaHash, perfil, curso_id },
     });
     novoUsuario.senha = undefined;
     res.status(201).json(novoUsuario);
   } catch (error) {
+    if (error.code === "P2002" && error.meta?.target?.includes("email")) {
+      return res.status(400).json({ error: "Este e-mail já está em uso." });
+    }
     res.status(400).json({ error: error.message });
   }
 };
 
-// Obter todos os usuários
+// Listar todos os usuários
 export const getAllUsuarios = async (req, res) => {
   try {
     const usuarios = await prisma.usuario.findMany({
-      select: { id: true, nome: true, perfil: true, curso: true },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        perfil: true,
+        curso: { select: { id: true, nome: true } },
+      },
+      orderBy: { nome: "asc" },
     });
     res.status(200).json(usuarios);
   } catch (error) {
@@ -58,7 +102,7 @@ export const getAllUsuarios = async (req, res) => {
   }
 };
 
-// Obter um usuário por ID
+// Obter detalhes de um usuário por ID
 export const getUsuarioById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -67,11 +111,10 @@ export const getUsuarioById = async (req, res) => {
       select: {
         id: true,
         nome: true,
+        email: true,
         perfil: true,
-        curso_id: true,
         curso: true,
-        sugestoes: true,
-        emprestimos: true,
+        _count: { select: { emprestimos: true, sugestoes: true } },
       },
     });
 
@@ -85,13 +128,13 @@ export const getUsuarioById = async (req, res) => {
   }
 };
 
-// Atualizar um usuário
+// Atualizar um usuário existente
 export const updateUsuario = async (req, res) => {
   const { id } = req.params;
-  const { nome, senha, perfil, curso_id } = req.body;
+  const { nome, email, senha, perfil, curso_id } = req.body;
   try {
-    const data = { nome, perfil, curso_id };
-    // Se uma nova senha for fornecida, criptografa antes de atualizar
+    const data = { nome, email, perfil, curso_id };
+
     if (senha) {
       data.senha = await bcrypt.hash(senha, 8);
     }
@@ -104,6 +147,9 @@ export const updateUsuario = async (req, res) => {
     usuarioAtualizado.senha = undefined;
     res.status(200).json(usuarioAtualizado);
   } catch (error) {
+    if (error.code === "P2002" && error.meta?.target?.includes("email")) {
+      return res.status(400).json({ error: "Este e-mail já está em uso." });
+    }
     res.status(400).json({ error: error.message });
   }
 };
@@ -112,21 +158,14 @@ export const updateUsuario = async (req, res) => {
 export const deleteUsuario = async (req, res) => {
   const { id } = req.params;
   try {
-    // Antes de deletar o usuário, é preciso remover as suas dependências
-    await prisma.sugestaoDeLivro.deleteMany({
-      where: { usuario_id: id },
-    });
-    await prisma.emprestimo.deleteMany({
-      where: { usuario_id: id },
-    });
+    await prisma.$transaction([
+      prisma.sugestaoDeLivro.deleteMany({ where: { usuario_id: id } }),
+      prisma.emprestimo.deleteMany({ where: { usuario_id: id } }),
+      prisma.usuario.delete({ where: { id } }),
+    ]);
 
-    // Agora pode deletar o usuário
-    await prisma.usuario.delete({
-      where: { id },
-    });
-
-    res.status(204).send(); // 204 No Content indica sucesso na exclusão
+    res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Ocorreu um erro ao deletar o usuário." });
   }
 };

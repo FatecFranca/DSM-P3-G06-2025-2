@@ -29,6 +29,8 @@ export const getAllLivros = async (req, res) => {
   }
 };
 
+// Funções exclusivas para administradores
+
 // Obter um livro por ID
 export const getLivroById = async (req, res) => {
   const { id } = req.params;
@@ -50,8 +52,6 @@ export const getLivroById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// Funções exclusivas para administradores
 
 // Criar um novo livro
 export const createLivro = async (req, res) => {

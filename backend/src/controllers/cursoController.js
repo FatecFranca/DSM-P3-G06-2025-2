@@ -19,6 +19,8 @@ export const getAllCursos = async (req, res) => {
   }
 };
 
+// Funções exclusivas para administradores
+
 // Obter um curso por ID
 export const getCursoById = async (req, res) => {
   const { id } = req.params;
@@ -40,8 +42,6 @@ export const getCursoById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// Funções exclusivas para administradores
 
 // Criar um novo curso
 export const createCurso = async (req, res) => {

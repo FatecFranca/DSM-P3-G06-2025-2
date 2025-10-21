@@ -313,7 +313,7 @@ export default function LoginPage() {
               <span className="font-medium">Iago Rodrigues Pinheiro</span>
               <div className="flex gap-2">
                 <a 
-                  href="https://linkedin.com/in/iago-pinheiro" 
+                  href="https://www.linkedin.com/in/iago-pinheiroo/" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-blue-600 transition-colors"

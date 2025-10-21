@@ -1,6 +1,7 @@
 "use client";
 
-import { BookOpen, Users, Shield, Target, Github, Linkedin } from "lucide-react";
+import Image from "next/image";
+import { Users, Shield, Target, Github, Linkedin } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 
 export default function AboutPage() {
@@ -9,12 +10,16 @@ export default function AboutPage() {
       {/* Hero Section */}
       <div className="text-center space-y-6">
         <div className="flex justify-center">
-          <BookOpen className="h-16 w-16" style={{ color: 'var(--primary-color)' }} />
+          <Image 
+            src="/logo/Logo - OpenPages.svg" 
+            alt="OpenPages Logo" 
+            width={220} 
+            height={50}
+            className="h-14 w-auto"
+            priority
+          />
         </div>
         <div className="space-y-4">
-          <h1 className="text-4xl font-medium" style={{ color: 'var(--title-color)' }}>
-            OpenPages
-          </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Plataforma de livros acadêmicos da FATEC que conecta estudantes aos recursos 
             bibliográficos essenciais para sua formação acadêmica.

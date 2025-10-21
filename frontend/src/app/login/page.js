@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import { BookOpen, Github, Linkedin } from "lucide-react";
+import { Github, Linkedin } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/contexts/AppContext";
 
@@ -108,12 +109,14 @@ export default function LoginPage() {
         {/* Logo and Title */}
         <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="flex items-center gap-2">
-              <BookOpen className="h-8 w-8" style={{ color: 'var(--primary-color)' }} />
-              <h1 className="text-2xl font-medium" style={{ color: 'var(--title-color)' }}>
-                OpenPages
-              </h1>
-            </div>
+            <Image 
+              src="/logo/Logo - OpenPages.svg" 
+              alt="OpenPages Logo" 
+              width={200} 
+              height={45}
+              className="h-10 w-auto"
+              priority
+            />
           </div>
           <p className="text-gray-600">
             Plataforma de Livros Acadêmicos - FATEC

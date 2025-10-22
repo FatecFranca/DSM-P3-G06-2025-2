@@ -6,7 +6,22 @@ import jwt from "jsonwebtoken";
 export const login = async (req, res) => {
   const { email, senha } = req.body;
   try {
-    const usuario = await prisma.usuario.findUnique({ where: { email } });
+    if (!email || !senha) {
+      console.log("Validação falhou - campos faltando:", {
+        email: !email,
+        senha: !senha,
+      });
+      return res
+        .status(400)
+        .json({ error: "E-mail e senha são obrigatórios." });
+    }
+
+    const usuario = await prisma.usuario.findFirst({
+      where: {
+        OR: [{ email: email }, { email: email.toLowerCase() }],
+      },
+    });
+
     if (!usuario) {
       return res.status(401).json({ error: "E-mail ou senha inválidos." });
     }
@@ -22,8 +37,20 @@ export const login = async (req, res) => {
       { expiresIn: "8h" }
     );
 
-    usuario.senha = undefined;
-    res.status(200).json({ usuario, token });
+    // Remove a senha antes de enviar
+    delete usuario.senha;
+
+    // Retorna um objeto com a estrutura esperada pelo frontend
+    res.status(200).json({
+      token,
+      usuario: {
+        id: usuario.id,
+        nome: usuario.nome,
+        email: usuario.email,
+        perfil: usuario.perfil,
+        curso_id: usuario.curso_id,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: "Ocorreu um erro ao tentar fazer login." });
   }
@@ -39,7 +66,10 @@ export const cadastro = async (req, res) => {
         .json({ error: "Nome, e-mail e senha são obrigatórios." });
     }
 
-    const userExists = await prisma.usuario.findUnique({ where: { email } });
+    const userExists = await prisma.usuario.findFirst({
+      where: { email },
+    });
+
     if (userExists) {
       return res.status(400).json({ error: "Este e-mail já está em uso." });
     }
@@ -51,8 +81,8 @@ export const cadastro = async (req, res) => {
         nome,
         email,
         senha: senhaHash,
-        perfil: "usuario", // Perfil é sempre "usuario" no cadastro público
-        curso_id,
+        perfil: "usuario",
+        curso_id: curso_id || undefined,
       },
     });
 

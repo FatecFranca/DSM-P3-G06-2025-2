@@ -18,8 +18,6 @@ const router = express.Router();
  *   get:
  *     summary: Listar todos os cursos
  *     tags: [Cursos]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de cursos
@@ -36,6 +34,8 @@ const router = express.Router();
  *                     type: string
  *                   descricao:
  *                     type: string
+ *                   duracao:
+ *                     type: number
  *                   _count:
  *                     type: object
  *                     properties:
@@ -43,10 +43,8 @@ const router = express.Router();
  *                         type: number
  *                       livros:
  *                         type: number
- *       401:
- *         description: Não autorizado
  */
-router.get("/", verifyJWT, getAllCursos);
+router.get("/", getAllCursos);
 
 // Rotas do Adiministrador
 

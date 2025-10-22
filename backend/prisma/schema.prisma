@@ -34,14 +34,15 @@ atrasado
 }
 
 model Usuario {
-id String @id @default(auto()) @map("_id") @db.ObjectId
-nome String
-senha String
-perfil Perfil
-curso_id String? @db.ObjectId
-curso Curso? @relation(fields: [curso_id], references: [id])
-emprestimos Emprestimo[]
-sugestoes SugestaoDeLivro[]
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  nome String
+  email String @unique
+  senha String
+  perfil Perfil @default(usuario)
+  curso_id String? @db.ObjectId
+  curso Curso? @relation(fields: [curso_id], references: [id])
+  emprestimos Emprestimo[]
+  sugestoes SugestaoDeLivro[]
 }
 
 model Curso {

@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
 import { toast } from "sonner";
 
 export default function SuggestPage() {
@@ -95,18 +94,20 @@ export default function SuggestPage() {
             <Label htmlFor="course" style={{ color: 'var(--title-color)' }}>
               Curso Relacionado *
             </Label>
-            <Select value={formData.course} onValueChange={(value) => handleInputChange("course", value)}>
-              <SelectTrigger className="rounded-lg border-gray-300">
-                <SelectValue placeholder="Selecione um curso" />
-              </SelectTrigger>
-              <SelectContent>
-                {courses.map((course) => (
-                  <SelectItem key={course.value} value={course.value}>
-                    {course.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <select
+              id="course"
+              value={formData.course}
+              onChange={(e) => handleInputChange("course", e.target.value)}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              required
+            >
+              <option value="">Selecione um curso</option>
+              {courses.map((course) => (
+                <option key={course.value} value={course.value}>
+                  {course.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Reason */}

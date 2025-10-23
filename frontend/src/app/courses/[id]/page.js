@@ -38,13 +38,38 @@ export default function CourseDetailPage() {
 
   if (!course) {
     return (
-      <div className="text-center py-16">
-        <h2 className="text-xl font-medium mb-4" style={{ color: 'var(--title-color)' }}>
-          Curso não encontrado
-        </h2>
-        <Button onClick={() => router.push('/courses')}>
-          Voltar aos Cursos
-        </Button>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center space-y-6 max-w-md">
+          <div className="relative">
+            <div className="w-24 h-24 mx-auto bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+              <BookOpen className="w-12 h-12 text-gray-400" />
+            </div>
+            <div className="absolute -top-2 -right-2 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+              <span className="text-red-600 text-xl font-bold">!</span>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <h2 className="text-3xl font-semibold" style={{ color: 'var(--title-color)' }}>
+              Curso não encontrado
+            </h2>
+            <p className="text-gray-600 leading-relaxed">
+              O curso que você está procurando não existe ou foi removido. Volte para a lista de cursos e tente novamente.
+            </p>
+          </div>
+          
+          <Button 
+            onClick={() => router.push('/courses')}
+            className="px-8 py-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+            style={{ 
+              backgroundColor: 'var(--primary-color)',
+              color: 'var(--text-color-light)'
+            }}
+          >
+            <ChevronLeft className="w-4 h-4 mr-2" />
+            Voltar aos Cursos
+          </Button>
+        </div>
       </div>
     );
   }

@@ -2,8 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useApp } from "@/contexts/AppContext";
-import { CourseCard } from "@/components/cards/CourseCard";
-import { GraduationCap, BookOpen, ArrowRight } from "lucide-react";
+import { GraduationCap, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { api } from "@/app/services/api";
 import { toast } from "sonner";
@@ -107,13 +106,8 @@ export default function CoursesPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="space-y-3 flex-1">
-                      <div className="inline-block px-3 py-1 bg-[#45483b]/10 rounded-lg">
-                        <span className="text-sm font-medium text-[#45483b]">
-                          {course.duracao} anos
-                        </span>
-                      </div>
                       <h3
-                        className="text-xl font-medium leading-tight"
+                        className="text-xl font-semibold leading-tight"
                         style={{ color: "var(--title-color)" }}
                       >
                         {course.nome}

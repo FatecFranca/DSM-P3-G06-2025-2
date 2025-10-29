@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/Card";
@@ -10,31 +10,74 @@ import { Input } from "@/components/ui/Input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { Search, Heart, BookOpen, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
-import { courses } from "@/data/mock-data";
+import { api } from "@/app/services/api";
 
 export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { user, books } = useApp();
+  const { user } = useApp();
   const [searchTerm, setSearchTerm] = useState("");
+  const [course, setCourse] = useState(null);
+  const [books, setBooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   const courseId = params.id;
-  const course = courses.find(c => c.id === courseId);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Carregar todos os cursos e encontrar o específico
+        const allCourses = await api.cursos.listar();
+        const courseData = allCourses.find(c => c.id === courseId);
+        
+        if (!courseData) {
+          setCourse(null);
+          setIsLoading(false);
+          return;
+        }
+        
+        setCourse(courseData);
+        
+        // Carregar todos os livros e filtrar por curso
+        const allBooks = await api.livros.listar();
+        const courseBooksFiltered = allBooks.filter(book => book.curso_id === courseId);
+        setBooks(courseBooksFiltered);
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+        toast.error("Não foi possível carregar as informações do curso");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [courseId]);
   
   const filteredBooks = books.filter(book => 
-    book.courseId === courseId &&
-    (book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     book.author.toLowerCase().includes(searchTerm.toLowerCase()))
+    book.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    book.autor?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleLoanRequest = (book) => {
-    if (book.availability === 'Indisponível') {
+    if (!book.disponibilidade) {
       toast.error("Este livro não está disponível no momento");
       return;
     }
 
-    toast.success(`Solicitação de empréstimo para "${book.title}" enviada com sucesso!`);
+    toast.success(`Solicitação de empréstimo para "${book.titulo}" enviada com sucesso!`);
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 animate-pulse">
+        <div className="h-10 bg-gray-200 rounded w-40"></div>
+        <div className="bg-gray-200 h-64 rounded-3xl"></div>
+        <div className="bg-gray-200 h-96 rounded-2xl"></div>
+      </div>
+    );
+  }
 
   if (!course) {
     return (
@@ -88,20 +131,16 @@ export default function CourseDetailPage() {
       {/* Course Info - Hero Style */}
       <div className="bg-gradient-to-br from-white to-gray-50/50 p-8 md:p-12 rounded-3xl border border-gray-200/50 shadow-sm">
         <div className="text-center space-y-6">
-          <div className="inline-block px-4 py-2 bg-[#45483b]/10 rounded-xl">
-            <span className="text-lg font-semibold text-[#45483b]">{course.code}</span>
-          </div>
-          
           <div className="space-y-3">
             <h1 className="text-3xl md:text-4xl font-medium tracking-tight" style={{ color: 'var(--title-color)' }}>
-              {course.title}
+              {course.nome}
             </h1>
             <div className="w-20 h-1 mx-auto rounded-full" style={{ backgroundColor: 'var(--primary-color)' }}></div>
           </div>
           
           <div className="max-w-2xl mx-auto">
             <p className="text-gray-600 leading-relaxed">
-              {course.description}
+              {course.descricao || "Sem descrição disponível"}
             </p>
           </div>
 
@@ -174,16 +213,16 @@ export default function CourseDetailPage() {
               <TableBody>
                 {filteredBooks.map((book) => (
                   <TableRow key={book.id} className="hover:bg-gray-50/50 transition-colors">
-                    <TableCell className="font-medium py-4">{book.title}</TableCell>
-                    <TableCell className="py-4 text-gray-600">{book.author}</TableCell>
-                    <TableCell className="py-4 text-gray-600">{book.publisher}</TableCell>
-                    <TableCell className="py-4 text-gray-600">{book.edition}</TableCell>
+                    <TableCell className="font-medium py-4">{book.titulo}</TableCell>
+                    <TableCell className="py-4 text-gray-600">{book.autor}</TableCell>
+                    <TableCell className="py-4 text-gray-600">{book.editora}</TableCell>
+                    <TableCell className="py-4 text-gray-600">{book.edicao}</TableCell>
                     <TableCell className="py-4">
                       <Badge 
-                        variant={book.availability === 'Disponível' ? 'default' : 'destructive'}
-                        className={book.availability === 'Disponível' ? 'bg-green-100 text-green-700 hover:bg-green-100 shadow-sm' : 'shadow-sm'}
+                        variant={book.disponibilidade ? 'default' : 'destructive'}
+                        className={book.disponibilidade ? 'bg-green-100 text-green-700 hover:bg-green-100 shadow-sm' : 'shadow-sm'}
                       >
-                        {book.availability}
+                        {book.disponibilidade ? 'Disponível' : 'Indisponível'}
                       </Badge>
                     </TableCell>
                     {user?.role === 'user' && (
@@ -191,14 +230,14 @@ export default function CourseDetailPage() {
                         <Button
                           size="sm"
                           onClick={() => handleLoanRequest(book)}
-                          disabled={book.availability === 'Indisponível'}
+                          disabled={!book.disponibilidade}
                           className="rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
                           style={{ 
-                            backgroundColor: book.availability === 'Disponível' ? 'var(--primary-color)' : undefined,
-                            color: book.availability === 'Disponível' ? 'var(--text-color-light)' : undefined
+                            backgroundColor: book.disponibilidade ? 'var(--primary-color)' : undefined,
+                            color: book.disponibilidade ? 'var(--text-color-light)' : undefined
                           }}
                         >
-                          {book.availability === 'Disponível' ? 'Empréstimo' : 'Indisponível'}
+                          {book.disponibilidade ? 'Empréstimo' : 'Indisponível'}
                         </Button>
                       </TableCell>
                     )}

@@ -65,7 +65,7 @@ palavras_chave String[]
 curso_id String? @db.ObjectId
 curso Curso? @relation(fields: [curso_id], references: [id])
 disponibilidade Boolean
-data_cadastro DateTime
+data_cadastro DateTime? @default(now())
 exemplares Exemplar[]
 emprestimos Emprestimo[]
 }

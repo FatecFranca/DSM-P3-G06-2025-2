@@ -98,7 +98,7 @@ export const api = {
 
   // === Rotas de Livros ===
   livros: {
-    listar: () => request("/livros", { isPublic: true }),
+    listar: () => request("/livros"),
     obterPorId: (id) => request(`/livros/${id}`),
     criar: (livroData) =>
       request("/livros", {

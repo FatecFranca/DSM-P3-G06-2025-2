@@ -2,17 +2,13 @@ import prisma from "../database/client.js";
 
 // Funções acessíveis a todos os usuários logados
 
-// Obter todos os exemplares de um livro específico
+// Obter todos os exemplares de um livro específico ou todos os exemplares
 export const getAllExemplares = async (req, res) => {
-  const { livro_id } = req.query; // Filtro por ID do livro via query string
-
-  if (!livro_id) {
-    return res.status(400).json({ error: "O ID do livro é obrigatório." });
-  }
+  const { livro_id } = req.query; // Filtro por ID do livro via query string (opcional)
 
   try {
     const exemplares = await prisma.exemplar.findMany({
-      where: { id_livro: livro_id },
+      where: livro_id ? { id_livro: livro_id } : {},
       include: {
         livro: {
           select: { titulo: true },

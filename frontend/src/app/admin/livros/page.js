@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useApp } from "@/contexts/AppContext";
 import { Plus, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -32,6 +32,27 @@ export default function AdminLivrosPage() {
     palavras_chave: [],
     disponibilidade: true,
   });
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const tituloSugerido = searchParams.get("titulo");
+    const autorSugerido = searchParams.get("autor");
+    const editoraSugerida = searchParams.get("editora");
+
+    if (tituloSugerido || autorSugerido || editoraSugerida) {
+      setFormData((prev) => ({
+        ...prev,
+        titulo: tituloSugerido || "",
+        autor: autorSugerido || "",
+        editora: editoraSugerida || "",
+      }));
+
+      setShowDialog(true);
+
+      router.replace("/admin/livros", undefined, { shallow: true });
+    }
+  }, [searchParams, router]);
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -107,7 +128,6 @@ export default function AdminLivrosPage() {
         toast.success("Livro criado com sucesso!");
       }
 
-      // Recarregar lista de livros
       const livrosAtualizados = await api.livros.listar();
       setBooks(livrosAtualizados);
       handleCloseDialog();
@@ -128,7 +148,7 @@ export default function AdminLivrosPage() {
       setBooks(books.filter((b) => b.id !== id));
     } catch (error) {
       console.error("Erro ao excluir livro:", error);
-      toast.error("Erro ao excluir livro");
+      toast.error(error.message || "Erro ao excluir livro");
     }
   };
 

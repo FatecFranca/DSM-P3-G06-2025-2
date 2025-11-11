@@ -25,7 +25,7 @@ export default function AdminSugestoesPage() {
     const carregarSugestoes = async () => {
       try {
         setIsLoading(true);
-        const data = await api.sugestoes.listar();
+        const data = await api.sugestoes.listar({ status: "pendente" });
         setSugestoes(data);
       } catch (error) {
         console.error("Erro ao carregar sugestões:", error);
@@ -46,10 +46,10 @@ export default function AdminSugestoesPage() {
       setSugestoes(sugestoes.filter((s) => s.id !== sugestao.id));
 
       const queryParams = new URLSearchParams();
-      if (sugestao.titulo_sugerido)
-        queryParams.append("titulo", sugestao.titulo_sugerido);
-      if (sugestao.autor_sugerido)
-        queryParams.append("autor", sugestao.autor_sugerido);
+      if (sugestao.livro_sugerido)
+        queryParams.append("titulo", sugestao.livro_sugerido);
+      if (sugestao.autor) queryParams.append("autor", sugestao.autor);
+      if (sugestao.editora) queryParams.append("editora", sugestao.editora);
 
       router.push(`/admin/livros?${queryParams.toString()}`);
     } catch (error) {

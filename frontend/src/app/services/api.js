@@ -186,7 +186,7 @@ export const api = {
         data: emprestimoData,
       }),
     atualizar: (id, emprestimoData) =>
-      request(`/emprestimos/${id}`, {
+      request(`/sugestoes/${id}`, {
         method: "PUT",
         data: emprestimoData,
       }),
@@ -203,11 +203,14 @@ export const api = {
         method: "POST",
         data: sugestaoData,
       }),
-    listar: () => request("/sugestoes"),
-    obterPorId: (id) => request(`/sugestoes/${id}`),
+
+    listar: (params) =>
+      request(`/sugestoes${params ? `?${new URLSearchParams(params)}` : ""}`),
+
+    obterPorId: (id) => request(`/sugestoes/${id}/status`),
     atualizar: (id, sugestaoData) =>
-      request(`/sugestoes/${id}`, {
-        method: "PUT",
+      request(`/sugestoes/${id}/status`, {
+        method: "PATCH",
         data: sugestaoData,
       }),
     excluir: (id) =>

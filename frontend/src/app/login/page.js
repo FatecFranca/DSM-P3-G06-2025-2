@@ -27,14 +27,13 @@ export default function LoginPage() {
     email: "",
     senha: "",
     confirmarSenha: "",
-    curso_id: "", // Será preenchido após carregar os cursos
+    curso_id: "",
   });
 
   const [cursos, setCursos] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // Carrega a lista de cursos ao montar o componente
   useEffect(() => {
     const loadCursos = async () => {
       try {
@@ -61,7 +60,7 @@ export default function LoginPage() {
 
     try {
       const response = await api.auth.login(loginData);
-      console.log("Resposta do login:", response); // Log para debug
+      console.log("Resposta do login:", response);
 
       if (!response || !response.token || !response.usuario) {
         throw new Error("Resposta inválida do servidor");
@@ -117,7 +116,6 @@ export default function LoginPage() {
     }
 
     try {
-      // Remove o campo confirmarSenha antes de enviar
       const { confirmarSenha, ...cadastroData } = registerData;
 
       console.log("Enviando dados de cadastro:", {

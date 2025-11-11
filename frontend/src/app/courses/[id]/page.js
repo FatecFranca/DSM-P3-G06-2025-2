@@ -7,7 +7,15 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
+import SolicitarEmprestimoDialog from "@/components/ui/SolicitarEmprestimoDialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/Table";
 import { Search, Heart, BookOpen, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/app/services/api";
@@ -20,29 +28,31 @@ export default function CourseDetailPage() {
   const [course, setCourse] = useState(null);
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const courseId = params.id;
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Carregar todos os cursos e encontrar o específico
         const allCourses = await api.cursos.listar();
-        const courseData = allCourses.find(c => c.id === courseId);
-        
+        const courseData = allCourses.find((c) => c.id === courseId);
+
         if (!courseData) {
           setCourse(null);
           setIsLoading(false);
           return;
         }
-        
+
         setCourse(courseData);
-        
+
         // Carregar todos os livros e filtrar por curso
         const allBooks = await api.livros.listar();
-        const courseBooksFiltered = allBooks.filter(book => book.curso_id === courseId);
+        const courseBooksFiltered = allBooks.filter(
+          (book) => book.curso_id === courseId
+        );
         setBooks(courseBooksFiltered);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
@@ -54,19 +64,59 @@ export default function CourseDetailPage() {
 
     loadData();
   }, [courseId]);
-  
-  const filteredBooks = books.filter(book => 
-    book.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    book.autor?.toLowerCase().includes(searchTerm.toLowerCase())
+
+  const filteredBooks = books.filter(
+    (book) =>
+      book.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.autor?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleLoanRequest = (book) => {
+  const [showEmprestimoDialog, setShowEmprestimoDialog] = useState(false);
+  const [selectedExemplar, setSelectedExemplar] = useState(null);
+
+  const handleLoanRequest = async (book) => {
     if (!book.disponibilidade) {
       toast.error("Este livro não está disponível no momento");
       return;
     }
 
-    toast.success(`Solicitação de empréstimo para "${book.titulo}" enviada com sucesso!`);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Você precisa estar logado para solicitar empréstimos");
+        return;
+      }
+
+      // Buscar exemplares disponíveis do livro
+      const response = await fetch(
+        `/api/exemplares?livroId=${book.id}&disponivel=true`,
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Falha ao buscar exemplares disponíveis");
+      }
+
+      const exemplares = await response.json();
+      if (!exemplares || exemplares.length === 0) {
+        toast.error("Não há exemplares disponíveis para este livro");
+        return;
+      }
+
+      // Seleciona o primeiro exemplar disponível
+      setSelectedExemplar({
+        id: exemplares[0].id,
+        num_exemplar: exemplares[0].num_exemplar,
+        livro: book,
+      });
+      setShowEmprestimoDialog(true);
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
 
   if (isLoading) {
@@ -91,22 +141,26 @@ export default function CourseDetailPage() {
               <span className="text-red-600 text-xl font-bold">!</span>
             </div>
           </div>
-          
+
           <div className="space-y-3">
-            <h2 className="text-3xl font-semibold" style={{ color: 'var(--title-color)' }}>
+            <h2
+              className="text-3xl font-semibold"
+              style={{ color: "var(--title-color)" }}
+            >
               Curso não encontrado
             </h2>
             <p className="text-gray-600 leading-relaxed">
-              O curso que você está procurando não existe ou foi removido. Volte para a lista de cursos e tente novamente.
+              O curso que você está procurando não existe ou foi removido. Volte
+              para a lista de cursos e tente novamente.
             </p>
           </div>
-          
-          <Button 
-            onClick={() => router.push('/courses')}
+
+          <Button
+            onClick={() => router.push("/courses")}
             className="px-8 py-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
-            style={{ 
-              backgroundColor: 'var(--primary-color)',
-              color: 'var(--text-color-light)'
+            style={{
+              backgroundColor: "var(--primary-color)",
+              color: "var(--text-color-light)",
             }}
           >
             <ChevronLeft className="w-4 h-4 mr-2" />
@@ -121,7 +175,7 @@ export default function CourseDetailPage() {
     <div className="space-y-8">
       {/* Back Button */}
       <button
-        onClick={() => router.push('/courses')}
+        onClick={() => router.push("/courses")}
         className="flex items-center gap-2 text-[#45483b] hover:text-[#45483b]/80 font-medium transition-colors duration-200"
       >
         <ChevronLeft className="h-4 w-4" />
@@ -132,12 +186,18 @@ export default function CourseDetailPage() {
       <div className="bg-gradient-to-br from-white to-gray-50/50 p-8 md:p-12 rounded-3xl border border-gray-200/50 shadow-sm">
         <div className="text-center space-y-6">
           <div className="space-y-3">
-            <h1 className="text-3xl md:text-4xl font-medium tracking-tight" style={{ color: 'var(--title-color)' }}>
+            <h1
+              className="text-3xl md:text-4xl font-medium tracking-tight"
+              style={{ color: "var(--title-color)" }}
+            >
               {course.nome}
             </h1>
-            <div className="w-20 h-1 mx-auto rounded-full" style={{ backgroundColor: 'var(--primary-color)' }}></div>
+            <div
+              className="w-20 h-1 mx-auto rounded-full"
+              style={{ backgroundColor: "var(--primary-color)" }}
+            ></div>
           </div>
-          
+
           <div className="max-w-2xl mx-auto">
             <p className="text-gray-600 leading-relaxed">
               {course.descricao || "Sem descrição disponível"}
@@ -146,7 +206,12 @@ export default function CourseDetailPage() {
 
           <div className="flex items-center justify-center gap-2 text-sm text-gray-500 pt-4">
             <BookOpen className="h-4 w-4" />
-            <span>{filteredBooks.length} {filteredBooks.length === 1 ? 'livro disponível' : 'livros disponíveis'}</span>
+            <span>
+              {filteredBooks.length}{" "}
+              {filteredBooks.length === 1
+                ? "livro disponível"
+                : "livros disponíveis"}
+            </span>
           </div>
         </div>
       </div>
@@ -156,20 +221,24 @@ export default function CourseDetailPage() {
         <div className="space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
-              <h2 className="text-2xl font-medium" style={{ color: 'var(--title-color)' }}>
+              <h2
+                className="text-2xl font-medium"
+                style={{ color: "var(--title-color)" }}
+              >
                 Acervo Bibliográfico
               </h2>
               <p className="text-sm text-gray-600">
-                Explore os livros disponíveis para este curso
+                Explore os livros disponíveis para este curso e{" "}
+                <strong>solicite seu empréstimo</strong> com um clique.
               </p>
             </div>
-            
+
             <Button
-              onClick={() => router.push('/suggest')}
+              onClick={() => router.push("/suggest")}
               className="flex items-center gap-2 px-6 py-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
-              style={{ 
-                backgroundColor: 'var(--primary-color)',
-                color: 'var(--text-color-light)'
+              style={{
+                backgroundColor: "var(--primary-color)",
+                color: "var(--text-color-light)",
               }}
             >
               <Heart className="h-4 w-4" />
@@ -191,53 +260,113 @@ export default function CourseDetailPage() {
           {/* Results Counter */}
           {searchTerm && (
             <div className="text-sm text-gray-600 bg-blue-50/50 border border-blue-100 rounded-lg px-4 py-2 inline-block">
-              Encontrados <span className="font-medium text-[#45483b]">{filteredBooks.length}</span> {filteredBooks.length === 1 ? 'resultado' : 'resultados'} para "{searchTerm}"
+              Encontrados{" "}
+              <span className="font-medium text-[#45483b]">
+                {filteredBooks.length}
+              </span>{" "}
+              {filteredBooks.length === 1 ? "resultado" : "resultados"} para "
+              {searchTerm}"
             </div>
           )}
 
           {/* Books Table */}
           <div className="overflow-hidden rounded-xl border border-gray-200/50 shadow-sm">
             <Table>
-              <TableHeader style={{ backgroundColor: 'var(--primary-color)' }}>
+              <TableHeader style={{ backgroundColor: "var(--primary-color)" }}>
                 <TableRow className="border-b-0">
-                  <TableHead className="py-4" style={{ color: 'var(--text-color-light)' }}>Livro</TableHead>
-                  <TableHead className="py-4" style={{ color: 'var(--text-color-light)' }}>Autor</TableHead>
-                  <TableHead className="py-4" style={{ color: 'var(--text-color-light)' }}>Editora</TableHead>
-                  <TableHead className="py-4" style={{ color: 'var(--text-color-light)' }}>Edição</TableHead>
-                  <TableHead className="py-4" style={{ color: 'var(--text-color-light)' }}>Status</TableHead>
-                  {user?.role === 'user' && (
-                    <TableHead className="py-4" style={{ color: 'var(--text-color-light)' }}>Ação</TableHead>
+                  <TableHead
+                    className="py-4"
+                    style={{ color: "var(--text-color-light)" }}
+                  >
+                    Livro
+                  </TableHead>
+                  <TableHead
+                    className="py-4"
+                    style={{ color: "var(--text-color-light)" }}
+                  >
+                    Autor
+                  </TableHead>
+                  <TableHead
+                    className="py-4"
+                    style={{ color: "var(--text-color-light)" }}
+                  >
+                    Editora
+                  </TableHead>
+                  <TableHead
+                    className="py-4"
+                    style={{ color: "var(--text-color-light)" }}
+                  >
+                    Edição
+                  </TableHead>
+                  <TableHead
+                    className="py-4"
+                    style={{ color: "var(--text-color-light)" }}
+                  >
+                    Status
+                  </TableHead>
+                  {user?.role === "user" && (
+                    <TableHead
+                      className="py-4"
+                      style={{ color: "var(--text-color-light)" }}
+                    >
+                      Ação
+                    </TableHead>
                   )}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredBooks.map((book) => (
-                  <TableRow key={book.id} className="hover:bg-gray-50/50 transition-colors">
-                    <TableCell className="font-medium py-4">{book.titulo}</TableCell>
-                    <TableCell className="py-4 text-gray-600">{book.autor}</TableCell>
-                    <TableCell className="py-4 text-gray-600">{book.editora}</TableCell>
-                    <TableCell className="py-4 text-gray-600">{book.edicao}</TableCell>
+                  <TableRow
+                    key={book.id}
+                    className="hover:bg-gray-50/50 transition-colors cursor-pointer"
+                    onClick={() => router.push(`/livros/${book.id}`)}
+                  >
+                    <TableCell className="font-medium py-4">
+                      {book.titulo}
+                    </TableCell>
+                    <TableCell className="py-4 text-gray-600">
+                      {book.autor}
+                    </TableCell>
+                    <TableCell className="py-4 text-gray-600">
+                      {book.editora}
+                    </TableCell>
+                    <TableCell className="py-4 text-gray-600">
+                      {book.edicao}
+                    </TableCell>
                     <TableCell className="py-4">
-                      <Badge 
-                        variant={book.disponibilidade ? 'default' : 'destructive'}
-                        className={book.disponibilidade ? 'bg-green-100 text-green-700 hover:bg-green-100 shadow-sm' : 'shadow-sm'}
+                      <Badge
+                        variant={
+                          book.disponibilidade ? "default" : "destructive"
+                        }
+                        className={
+                          book.disponibilidade
+                            ? "bg-green-100 text-green-700 hover:bg-green-100 shadow-sm"
+                            : "shadow-sm"
+                        }
                       >
-                        {book.disponibilidade ? 'Disponível' : 'Indisponível'}
+                        {book.disponibilidade ? "Disponível" : "Indisponível"}
                       </Badge>
                     </TableCell>
-                    {user?.role === 'user' && (
+                    {user?.role === "user" && (
                       <TableCell className="py-4">
                         <Button
                           size="sm"
-                          onClick={() => handleLoanRequest(book)}
+                          onClick={(e) => {
+                            e.stopPropagation(); // Evita que o clique no botão navegue para a página do livro
+                            handleLoanRequest(book);
+                          }}
                           disabled={!book.disponibilidade}
                           className="rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
-                          style={{ 
-                            backgroundColor: book.disponibilidade ? 'var(--primary-color)' : undefined,
-                            color: book.disponibilidade ? 'var(--text-color-light)' : undefined
+                          style={{
+                            backgroundColor: book.disponibilidade
+                              ? "var(--primary-color)"
+                              : undefined,
+                            color: book.disponibilidade
+                              ? "var(--text-color-light)"
+                              : undefined,
                           }}
                         >
-                          {book.disponibilidade ? 'Empréstimo' : 'Indisponível'}
+                          {book.disponibilidade ? "Empréstimo" : "Indisponível"}
                         </Button>
                       </TableCell>
                     )}
@@ -245,14 +374,21 @@ export default function CourseDetailPage() {
                 ))}
                 {filteredBooks.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={user?.role === 'user' ? 6 : 5} className="text-center py-12">
+                    <TableCell
+                      colSpan={user?.role === "user" ? 6 : 5}
+                      className="text-center py-12"
+                    >
                       <div className="space-y-2">
                         <BookOpen className="h-12 w-12 mx-auto text-gray-300" />
                         <p className="text-gray-500 font-medium">
-                          {searchTerm ? 'Nenhum livro encontrado' : 'Nenhum livro cadastrado'}
+                          {searchTerm
+                            ? "Nenhum livro encontrado"
+                            : "Nenhum livro cadastrado"}
                         </p>
                         <p className="text-sm text-gray-400">
-                          {searchTerm ? 'Tente buscar com outros termos' : 'Aguarde novos livros serem adicionados'}
+                          {searchTerm
+                            ? "Tente buscar com outros termos"
+                            : "Aguarde novos livros serem adicionados"}
                         </p>
                       </div>
                     </TableCell>
@@ -263,6 +399,23 @@ export default function CourseDetailPage() {
           </div>
         </div>
       </Card>
+
+      {selectedExemplar && (
+        <SolicitarEmprestimoDialog
+          isOpen={showEmprestimoDialog}
+          onClose={() => {
+            setShowEmprestimoDialog(false);
+            setSelectedExemplar(null);
+          }}
+          exemplar={selectedExemplar}
+          onSuccess={() => {
+            toast.success(
+              `Empréstimo do livro "${selectedExemplar.livro.titulo}" realizado com sucesso!`
+            );
+            loadData(); // Recarregar os dados para atualizar disponibilidade
+          }}
+        />
+      )}
     </div>
   );
 }

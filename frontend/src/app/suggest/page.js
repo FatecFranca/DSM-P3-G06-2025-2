@@ -7,20 +7,19 @@ import { Label } from "@/components/ui/Label";
 import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
-import { api } from "@/app/services/api"; // Importa a API
+import { api } from "@/app/services/api";
 
 export default function SuggestPage() {
   const [formData, setFormData] = useState({
     bookName: "",
     author: "",
-    editora: "", // Campo adicionado
+    editora: "",
     course: "",
     reason: "",
   });
   const [cursos, setCursos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Carrega os cursos da API ao montar a página
   useEffect(() => {
     const loadCursos = async () => {
       try {
@@ -42,7 +41,7 @@ export default function SuggestPage() {
     if (
       !formData.bookName ||
       !formData.author ||
-      !formData.editora || // Validação adicionada
+      !formData.editora ||
       !formData.course ||
       !formData.reason
     ) {
@@ -51,7 +50,6 @@ export default function SuggestPage() {
       return;
     }
 
-    // Mapeia os dados do formulário para o formato esperado pela API
     const sugestaoData = {
       livro_sugerido: formData.bookName,
       autor: formData.author,
@@ -61,11 +59,9 @@ export default function SuggestPage() {
     };
 
     try {
-      // Chama a API para criar a sugestão
       await api.sugestoes.criar(sugestaoData);
       toast.success("Sugestão enviada com sucesso!");
 
-      // Reseta o formulário
       setFormData({
         bookName: "",
         author: "",

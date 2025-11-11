@@ -64,7 +64,7 @@ export default function AdminUsuariosPage() {
       setFormData({
         nome: userData.nome,
         email: userData.email,
-        senha: "", // Não preenchemos a senha ao editar
+        senha: "",
         perfil: userData.perfil,
         curso_id: userData.curso_id || "",
       });
@@ -140,7 +140,9 @@ export default function AdminUsuariosPage() {
       setUsuarios(usuarios.filter((u) => u.id !== userId));
     } catch (error) {
       console.error("Erro ao excluir usuário:", error);
-      toast.error("Erro ao excluir usuário");
+      // --- AQUI ESTÁ A CORREÇÃO ---
+      // Usar a mensagem de erro vinda do backend (via api.js)
+      toast.error(error.message || "Erro ao excluir usuário");
     }
   };
 

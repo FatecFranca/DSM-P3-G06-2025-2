@@ -38,21 +38,23 @@ export default function AdminSugestoesPage() {
     carregarSugestoes();
   }, [user, router]);
 
-  const handleAprovar = async (id) => {
-    if (!window.confirm("Tem certeza que deseja aprovar esta sugestão?")) {
-      return;
-    }
-
+  const handleAprovar = async (sugestao) => {
     try {
-      await api.sugestoes.aprovar(id);
-      toast.success("Sugestão aprovada com sucesso!");
+      await api.sugestoes.atualizar(sugestao.id, { status: "aprovada" });
+      toast.success("Sugestão aprovada! Redirecionando para criar o livro...");
 
-      // Atualizar a lista de sugestões
-      const sugestoesAtualizadas = sugestoes.filter((s) => s.id !== id);
-      setSugestoes(sugestoesAtualizadas);
+      setSugestoes(sugestoes.filter((s) => s.id !== sugestao.id));
+
+      const queryParams = new URLSearchParams();
+      if (sugestao.titulo_sugerido)
+        queryParams.append("titulo", sugestao.titulo_sugerido);
+      if (sugestao.autor_sugerido)
+        queryParams.append("autor", sugestao.autor_sugerido);
+
+      router.push(`/admin/livros?${queryParams.toString()}`);
     } catch (error) {
       console.error("Erro ao aprovar sugestão:", error);
-      toast.error("Erro ao aprovar sugestão");
+      toast.error(error.message || "Erro ao aprovar sugestão");
     }
   };
 
@@ -62,15 +64,14 @@ export default function AdminSugestoesPage() {
     }
 
     try {
-      await api.sugestoes.rejeitar(id);
+      await api.sugestoes.atualizar(id, { status: "rejeitada" });
       toast.success("Sugestão rejeitada com sucesso!");
 
-      // Atualizar a lista de sugestões
       const sugestoesAtualizadas = sugestoes.filter((s) => s.id !== id);
       setSugestoes(sugestoesAtualizadas);
     } catch (error) {
       console.error("Erro ao rejeitar sugestão:", error);
-      toast.error("Erro ao rejeitar sugestão");
+      toast.error(error.message || "Erro ao rejeitar sugestão");
     }
   };
 
@@ -111,8 +112,8 @@ export default function AdminSugestoesPage() {
             <SugestaoCard
               key={sugestao.id}
               sugestao={sugestao}
-              onAprovar={handleAprovar}
-              onRejeitar={handleRejeitar}
+              onAprovar={() => handleAprovar(sugestao)}
+              onRejeitar={() => handleRejeitar(sugestao.id)}
             />
           ))}
         </div>

@@ -1,5 +1,3 @@
-//! Base da template
-
 "use client";
 
 import { useApp } from "@/contexts/AppContext";
@@ -13,28 +11,23 @@ export default function Template({ children }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Se não tá logado e não tá na página de login, manda pra login
-    if (!user && pathname !== '/login') {
-      router.push('/login');
+    if (!user && pathname !== "/login") {
+      router.push("/login");
     }
-    
-    // Se já tá logado e tá na página de login, manda pra home
-    if (user && pathname === '/login') {
-      router.push('/');
+
+    if (user && pathname === "/login") {
+      router.push("/");
     }
   }, [user, pathname, router]);
 
-  // Se não tá logado e não é página de login, não renderiza nada
-  if (!user && pathname !== '/login') {
+  if (!user && pathname !== "/login") {
     return null;
   }
 
   return (
     <>
       {user && <Header />}
-      <main className="container mx-auto px-6 py-8">
-        {children}
-      </main>
+      <main className="container mx-auto px-6 py-8">{children}</main>
     </>
   );
 }

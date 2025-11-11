@@ -4,7 +4,8 @@ import prisma from "../database/client.js";
 
 // Obter todos os exemplares de um livro específico ou todos os exemplares
 export const getAllExemplares = async (req, res) => {
-  const { livro_id } = req.query; // Filtro por ID do livro via query string (opcional)
+  // 1. LEIA OS DOIS PARÂMETROS
+  const { livro_id, disponivel } = req.query;
 
   try {
     const exemplares = await prisma.exemplar.findMany({
@@ -13,7 +14,6 @@ export const getAllExemplares = async (req, res) => {
         livro: {
           select: { titulo: true },
         },
-        // Inclui empréstimos para verificar a disponibilidade
         emprestimos: {
           where: {
             status: { in: ["ativo", "atrasado"] },
@@ -25,12 +25,17 @@ export const getAllExemplares = async (req, res) => {
       },
     });
 
-    // Adiciona um campo virtual "disponivel" para facilitar o frontend
-    const exemplaresComStatus = exemplares.map((ex) => ({
+    let exemplaresComStatus = exemplares.map((ex) => ({
       ...ex,
       disponivel: ex.emprestimos.length === 0,
     }));
 
+    // 2. APLIQUE O FILTRO SE ELE FOI SOLICITADO
+    if (disponivel === "true") {
+      exemplaresComStatus = exemplaresComStatus.filter((ex) => ex.disponivel);
+    }
+
+    // 3. RETORNE A LISTA (AGORA FILTRADA, SE NECESSÁRIO)
     res.status(200).json(exemplaresComStatus);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -71,7 +76,6 @@ export const updateExemplar = async (req, res) => {
 export const deleteExemplar = async (req, res) => {
   const { id } = req.params;
   try {
-    // Verifica se o exemplar está em um empréstimo ativo
     const emprestimosAtivos = await prisma.emprestimo.count({
       where: {
         exemplarId: id,

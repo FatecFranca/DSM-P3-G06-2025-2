@@ -8,38 +8,46 @@ export const createEmprestimo = async (req, res) => {
   const usuario_id = req.userId;
 
   try {
-    // 1. Verificar se o exemplar está disponível
-    const exemplarDisponivel = await prisma.exemplar.findFirst({
+    const exemplar = req.exemplar;
+
+    const novoEmprestimo = await prisma.emprestimo.create({
+      data: {
+        usuario_id,
+        exemplarId,
+        livro_id: exemplar.livro.id,
+        data_emprestimo: new Date(),
+        data_devolucao_prevista: new Date(data_devolucao_prevista),
+        status: "ativo",
+      },
+      include: {
+        livro: true,
+        usuario: {
+          select: {
+            nome: true,
+            email: true,
+          },
+        },
+        exemplar: true,
+      },
+    });
+
+    const exemplaresDisponiveis = await prisma.exemplar.count({
       where: {
-        id: exemplarId,
+        id_livro: exemplar.livro.id,
         emprestimos: {
           none: {
             status: { in: ["ativo", "atrasado"] },
           },
         },
       },
-      include: {
-        livro: true,
-      },
     });
 
-    if (!exemplarDisponivel) {
-      return res
-        .status(400)
-        .json({ error: "Este exemplar não está disponível para empréstimo." });
+    if (exemplaresDisponiveis === 0) {
+      await prisma.livro.update({
+        where: { id: exemplar.livro.id },
+        data: { disponibilidade: false },
+      });
     }
-
-    // 2. Criar o empréstimo
-    const novoEmprestimo = await prisma.emprestimo.create({
-      data: {
-        usuario_id,
-        exemplarId,
-        livro_id: exemplarDisponivel.livro.id,
-        data_emprestimo: new Date(),
-        data_devolucao_prevista: new Date(data_devolucao_prevista),
-        status: "ativo",
-      },
-    });
 
     res.status(201).json(novoEmprestimo);
   } catch (error) {
@@ -95,7 +103,20 @@ export const getAllEmprestimos = async (req, res) => {
 export const updateEmprestimo = async (req, res) => {
   const { id } = req.params;
   const { status, data_devolucao_real } = req.body;
+
   try {
+    const emprestimoAtual = await prisma.emprestimo.findUnique({
+      where: { id },
+      include: {
+        livro: true,
+        exemplar: true,
+      },
+    });
+
+    if (!emprestimoAtual) {
+      return res.status(404).json({ error: "Empréstimo não encontrado" });
+    }
+
     const data = { status };
 
     if (status === "concluido") {
@@ -104,10 +125,39 @@ export const updateEmprestimo = async (req, res) => {
         : new Date();
     }
 
+    // Atualizar o empréstimo
     const emprestimoAtualizado = await prisma.emprestimo.update({
       where: { id },
       data,
+      include: {
+        livro: true,
+        usuario: {
+          select: {
+            nome: true,
+            email: true,
+          },
+        },
+        exemplar: true,
+      },
     });
+
+    if (status === "concluido") {
+      const outrosEmprestimosAtivos = await prisma.emprestimo.count({
+        where: {
+          livro_id: emprestimoAtual.livro_id,
+          status: { in: ["ativo", "atrasado"] },
+          id: { not: id },
+        },
+      });
+
+      if (outrosEmprestimosAtivos === 0) {
+        await prisma.livro.update({
+          where: { id: emprestimoAtual.livro_id },
+          data: { disponibilidade: true },
+        });
+      }
+    }
+
     res.status(200).json(emprestimoAtualizado);
   } catch (error) {
     res.status(400).json({ error: error.message });

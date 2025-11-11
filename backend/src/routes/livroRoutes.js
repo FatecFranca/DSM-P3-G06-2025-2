@@ -76,13 +76,11 @@ const router = express.Router();
  */
 router.get("/", verifyJWT, getAllLivros);
 
-// Rotas do Adiministrador
-
 /**
  * @swagger
  * /livros/{id}:
  *   get:
- *     summary: Obter livro por ID (admin)
+ *     summary: Obter livro por ID
  *     tags: [Livros]
  *     security:
  *       - bearerAuth: []
@@ -129,7 +127,9 @@ router.get("/", verifyJWT, getAllLivros);
  *       404:
  *         description: Livro não encontrado
  */
-router.get("/:id", verifyJWT, isAdmin, getLivroById);
+router.get("/:id", verifyJWT, getLivroById);
+
+// Rotas do Adiministrador
 
 /**
  * @swagger

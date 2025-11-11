@@ -8,7 +8,6 @@ export const getAllCursos = async (req, res) => {
     const cursos = await prisma.curso.findMany({
       include: {
         _count: {
-          // Inclui a contagem de usuários e livros em cada curso
           select: { usuarios: true, livros: true },
         },
       },
@@ -28,7 +27,7 @@ export const getCursoById = async (req, res) => {
     const curso = await prisma.curso.findUnique({
       where: { id },
       include: {
-        usuarios: { select: { id: true, nome: true, email: true } }, // Retorna dados básicos dos usuários
+        usuarios: { select: { id: true, nome: true, email: true } },
         livros: true,
       },
     });
@@ -75,7 +74,6 @@ export const updateCurso = async (req, res) => {
 export const deleteCurso = async (req, res) => {
   const { id } = req.params;
   try {
-    // Verifica se existem usuários ou livros associados ao curso
     const curso = await prisma.curso.findUnique({
       where: { id },
       include: { _count: { select: { usuarios: true, livros: true } } },

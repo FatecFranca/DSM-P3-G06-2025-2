@@ -33,7 +33,7 @@ export const getAllSugestoes = async (req, res) => {
   const { status } = req.query;
   try {
     const where = {};
-    if (status) where.status = status; // Filtra por 'pendente', 'aprovada' ou 'rejeitada'
+    if (status) where.status = status;
 
     const sugestoes = await prisma.sugestaoDeLivro.findMany({
       where,
@@ -54,7 +54,7 @@ export const getAllSugestoes = async (req, res) => {
 // Atualizar o status de uma sugestão (aceitar/rejeitar)
 export const updateSugestaoStatus = async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body; // Espera receber 'aprovada' ou 'rejeitada'
+  const { status } = req.body;
 
   if (!["aprovada", "rejeitada"].includes(status)) {
     return res

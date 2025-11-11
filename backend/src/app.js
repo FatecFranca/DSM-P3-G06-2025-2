@@ -29,7 +29,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://localhost:8080/api-docs", // Servidor de desenvolvimento
+        url: "http://localhost:8080/api-docs", // Rota do Swagger UI
       },
     ],
     components: {

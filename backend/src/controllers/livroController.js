@@ -76,7 +76,7 @@ export const createLivro = async (req, res) => {
         palavras_chave,
         curso_id,
         disponibilidade,
-        data_cadastro: new Date(), // Define a data de cadastro automaticamente
+        data_cadastro: new Date(),
       },
     });
     res.status(201).json(novoLivro);
@@ -104,17 +104,12 @@ export const updateLivro = async (req, res) => {
 export const deleteLivro = async (req, res) => {
   const { id } = req.params;
   try {
-    // Para deletar um livro, primeiro precisamos remover suas dependências:
-    // 1. Empréstimos associados a este livro
     await prisma.emprestimo.deleteMany({
       where: { livro_id: id },
     });
-    // 2. Exemplares deste livro
     await prisma.exemplar.deleteMany({
       where: { id_livro: id },
     });
-
-    // 3. Agora podemos deletar o livro
     await prisma.livro.delete({
       where: { id },
     });

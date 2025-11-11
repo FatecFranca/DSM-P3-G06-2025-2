@@ -7,6 +7,7 @@ import {
   deleteEmprestimo,
 } from "../controllers/emprestimoController.js";
 import { verifyJWT, isAdmin } from "../middleware/autenticacao.js";
+import { verificarDisponibilidadeExemplar } from "../middleware/verificarDisponibilidade.js";
 
 const router = express.Router();
 
@@ -43,7 +44,7 @@ const router = express.Router();
  *       401:
  *         description: Não autorizado
  */
-router.post("/", verifyJWT, createEmprestimo);
+router.post("/", verifyJWT, verificarDisponibilidadeExemplar, createEmprestimo);
 
 /**
  * @swagger

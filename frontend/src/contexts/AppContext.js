@@ -1,13 +1,12 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
-import { initialBooks } from "@/data/mock-data";
 
 const AppContext = createContext(undefined);
 
 export function AppProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [books, setBooks] = useState(initialBooks);
+  const [books, setBooks] = useState();
 
   const handleLogin = (userData) => {
     setUser(userData);
@@ -20,22 +19,20 @@ export function AppProvider({ children }) {
   const handleAddBook = (newBook) => {
     const book = {
       ...newBook,
-      id: Date.now().toString()
+      id: Date.now().toString(),
     };
-    setBooks(prev => [...prev, book]);
+    setBooks((prev) => [...prev, book]);
     return book;
   };
 
   const handleEditBook = (id, updatedBook) => {
-    setBooks(prev => 
-      prev.map(book => 
-        book.id === id ? { ...book, ...updatedBook } : book
-      )
+    setBooks((prev) =>
+      prev.map((book) => (book.id === id ? { ...book, ...updatedBook } : book))
     );
   };
 
   const handleDeleteBook = (id) => {
-    setBooks(prev => prev.filter(book => book.id !== id));
+    setBooks((prev) => prev.filter((book) => book.id !== id));
   };
 
   return (

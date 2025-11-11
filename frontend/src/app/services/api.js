@@ -35,12 +35,36 @@ async function request(endpoint, options = {}) {
       endpoint,
       method,
       data,
-      headers: config.headers,
     });
   }
 
   try {
     const response = await fetch(`${API_URL}${endpoint}`, config);
+
+    if (response.status === 204) {
+      console.log("Resposta recebida (204 No Content):", {
+        status: response.status,
+      });
+      return null;
+    }
+
+    if (!response.ok) {
+      let errorData = {
+        error: `Erro ${response.status}: ${response.statusText}`,
+      };
+
+      try {
+        errorData = await response.json();
+      } catch (e) {}
+
+      console.error("Erro na resposta:", {
+        status: response.status,
+        data: errorData,
+      });
+
+      throw new Error(errorData.error || `Erro ${response.status}`);
+    }
+
     const responseData = await response.json();
 
     console.log("Resposta recebida:", {
@@ -48,13 +72,9 @@ async function request(endpoint, options = {}) {
       data: responseData,
     });
 
-    if (!response.ok) {
-      throw new Error(responseData.error || "Erro na requisição");
-    }
-
     return responseData;
   } catch (error) {
-    console.error("Erro na requisição:", error);
+    console.error("Erro na requisição (fetch/catch):", error);
     throw error;
   }
 }

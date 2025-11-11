@@ -1,7 +1,28 @@
+"use client";
+
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { CheckCircle, XCircle } from "lucide-react";
+
+const formatarData = (dataString) => {
+  if (!dataString) {
+    return "Pendente";
+  }
+
+  let data = new Date(dataString);
+
+  if (isNaN(data.getTime())) {
+    const dataCorrigida = dataString.replace(" ", "T");
+    data = new Date(dataCorrigida);
+
+    if (isNaN(data.getTime())) {
+      return "Data inválida";
+    }
+  }
+
+  return data.toLocaleDateString("pt-BR");
+};
 
 export default function EmprestimoCard({ emprestimo, onFinalize }) {
   const status = emprestimo.data_devolucao
@@ -41,11 +62,9 @@ export default function EmprestimoCard({ emprestimo, onFinalize }) {
 
           <div>
             <h4 className="font-medium">Livro</h4>
-            <p className="text-sm text-gray-600">
-              {emprestimo.exemplar.livro.titulo}
-            </p>
+            <p className="text-sm text-gray-600">{emprestimo.livro?.titulo}</p>
             <p className="text-xs text-gray-500">
-              Exemplar #{emprestimo.exemplar.num_exemplar}
+              Exemplar #{emprestimo.exemplar?.num_exemplar}
             </p>
           </div>
 
@@ -59,7 +78,10 @@ export default function EmprestimoCard({ emprestimo, onFinalize }) {
             <div>
               <h4 className="text-sm font-medium">Devolução Prevista</h4>
               <p className="text-sm text-gray-600">
-                {formatDate(emprestimo.data_prevista)}
+                <strong>
+                  {" "}
+                  {formatarData(emprestimo.data_devolucao_prevista)}
+                </strong>
               </p>
             </div>
           </div>

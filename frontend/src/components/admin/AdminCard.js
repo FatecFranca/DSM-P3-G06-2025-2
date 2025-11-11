@@ -1,3 +1,5 @@
+"use client";
+
 import { Card } from "@/components/ui/Card";
 
 export default function AdminCard({ title, description, icon: Icon, onClick }) {

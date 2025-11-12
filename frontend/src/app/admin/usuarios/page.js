@@ -140,8 +140,6 @@ export default function AdminUsuariosPage() {
       setUsuarios(usuarios.filter((u) => u.id !== userId));
     } catch (error) {
       console.error("Erro ao excluir usuário:", error);
-      // --- AQUI ESTÁ A CORREÇÃO ---
-      // Usar a mensagem de erro vinda do backend (via api.js)
       toast.error(error.message || "Erro ao excluir usuário");
     }
   };

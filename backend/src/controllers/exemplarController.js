@@ -4,7 +4,6 @@ import prisma from "../database/client.js";
 
 // Obter todos os exemplares de um livro específico ou todos os exemplares
 export const getAllExemplares = async (req, res) => {
-  // 1. LEIA OS DOIS PARÂMETROS
   const { livro_id, disponivel } = req.query;
 
   try {
@@ -30,12 +29,10 @@ export const getAllExemplares = async (req, res) => {
       disponivel: ex.emprestimos.length === 0,
     }));
 
-    // 2. APLIQUE O FILTRO SE ELE FOI SOLICITADO
     if (disponivel === "true") {
       exemplaresComStatus = exemplaresComStatus.filter((ex) => ex.disponivel);
     }
 
-    // 3. RETORNE A LISTA (AGORA FILTRADA, SE NECESSÁRIO)
     res.status(200).json(exemplaresComStatus);
   } catch (error) {
     res.status(500).json({ error: error.message });

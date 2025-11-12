@@ -54,11 +54,12 @@ export default function HomePage() {
                 className="text-xl font-medium"
                 style={{ color: "var(--title-color)" }}
               >
-                Consulte e Solicite empréstimos
+                Consulte o acervo da biblioteca
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Navegue pelos cursos e encontre os livros disponíveis para cada
-                disciplina com facilidade e rapidez.
+                Navegue pelos cursos e encontre os{" "}
+                <strong>livros disponíveis</strong> para cada disciplina com
+                facilidade e rapidez.
               </p>
             </div>
           </div>
@@ -77,8 +78,8 @@ export default function HomePage() {
                 Faça Sugestões
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Sugira novos livros que considera importantes para seu curso e
-                contribua para o crescimento do acervo.
+                <strong>Sugira novos livros</strong> que considera importantes
+                para seu curso e contribua para o crescimento do acervo.
               </p>
             </div>
           </div>
@@ -97,8 +98,8 @@ export default function HomePage() {
                 Apoie seus Estudos
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Acesse informações atualizadas sobre disponibilidade e solicite
-                empréstimos de forma simples.
+                Acesse informações atualizadas sobre disponibilidade e
+                <strong> solicite empréstimos</strong> de forma simples.
               </p>
             </div>
           </div>

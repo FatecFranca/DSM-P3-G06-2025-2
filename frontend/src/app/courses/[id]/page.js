@@ -228,8 +228,8 @@ export default function CourseDetailPage() {
                 Acervo Bibliográfico
               </h2>
               <p className="text-sm text-gray-600">
-                Explore os livros disponíveis para este curso e{" "}
-                <strong>solicite seu empréstimo</strong> com um clique.
+                Explore os livros disponíveis para este curso e
+                <strong> solicite seu empréstimo</strong> com um clique.
               </p>
             </div>
 

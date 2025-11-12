@@ -37,10 +37,8 @@ export const login = async (req, res) => {
       { expiresIn: "8h" }
     );
 
-    // Remove a senha antes de enviar
     delete usuario.senha;
 
-    // Retorna um objeto com a estrutura esperada pelo frontend
     res.status(200).json({
       token,
       usuario: {
@@ -113,15 +111,39 @@ export const createUsuario = async (req, res) => {
   }
 };
 
-// Listar todos os usuários
 export const getAllUsuarios = async (req, res) => {
+  const { nome, email, perfil, curso_id } = req.query;
+
   try {
+    const where = {};
+
+    if (nome) {
+      where.nome = {
+        contains: nome,
+        mode: "insensitive",
+      };
+    }
+    if (email) {
+      where.email = {
+        contains: email,
+        mode: "insensitive",
+      };
+    }
+    if (perfil) {
+      where.perfil = perfil;
+    }
+    if (curso_id) {
+      where.curso_id = curso_id;
+    }
+
     const usuarios = await prisma.usuario.findMany({
+      where,
       select: {
         id: true,
         nome: true,
         email: true,
         perfil: true,
+        curso_id: true,
         curso: { select: { id: true, nome: true } },
       },
       orderBy: { nome: "asc" },

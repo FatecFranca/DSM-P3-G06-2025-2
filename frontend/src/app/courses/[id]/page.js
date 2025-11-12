@@ -352,7 +352,7 @@ export default function CourseDetailPage() {
                         <Button
                           size="sm"
                           onClick={(e) => {
-                            e.stopPropagation(); // Evita que o clique no botão navegue para a página do livro
+                            e.stopPropagation();
                             handleLoanRequest(book);
                           }}
                           disabled={!book.disponibilidade}
@@ -412,7 +412,7 @@ export default function CourseDetailPage() {
             toast.success(
               `Empréstimo do livro "${selectedExemplar.livro.titulo}" realizado com sucesso!`
             );
-            loadData(); // Recarregar os dados para atualizar disponibilidade
+            loadData();
           }}
         />
       )}

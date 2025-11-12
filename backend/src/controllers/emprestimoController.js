@@ -77,12 +77,29 @@ export const getMeusEmprestimos = async (req, res) => {
 
 // Obter todos os empréstimos
 export const getAllEmprestimos = async (req, res) => {
-  const { usuario_id, exemplarId, status } = req.query;
+  const { userName, bookTitle, status } = req.query;
   try {
     const where = {};
-    if (usuario_id) where.usuario_id = usuario_id;
-    if (exemplarId) where.exemplarId = exemplarId;
-    if (status) where.status = status;
+
+    if (userName) {
+      where.usuario = {
+        nome: {
+          contains: userName,
+          mode: "insensitive",
+        },
+      };
+    }
+    if (bookTitle) {
+      where.livro = {
+        titulo: {
+          contains: bookTitle,
+          mode: "insensitive",
+        },
+      };
+    }
+    if (status) {
+      where.status = status;
+    }
 
     const emprestimos = await prisma.emprestimo.findMany({
       where,

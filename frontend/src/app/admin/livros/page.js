@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useApp } from "@/contexts/AppContext";
-import { Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import BookCard from "@/components/cards/BookCard";
 import { api } from "@/app/services/api";
@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/Dialog";
+import { Card } from "@/components/ui/Card";
 
 export default function AdminLivrosPage() {
   const router = useRouter();
@@ -34,6 +35,13 @@ export default function AdminLivrosPage() {
   });
 
   const searchParams = useSearchParams();
+
+  const [filtroInputs, setFiltroInputs] = useState({
+    titulo: "",
+    autor: "",
+    materia: "",
+  });
+  const [filtrosAplicados, setFiltrosAplicados] = useState({});
 
   useEffect(() => {
     const tituloSugerido = searchParams.get("titulo");
@@ -63,7 +71,15 @@ export default function AdminLivrosPage() {
     const carregarLivros = async () => {
       try {
         setIsLoading(true);
-        const livrosData = await api.livros.listar();
+
+        const filtrosLimpos = {};
+        Object.entries(filtrosAplicados).forEach(([key, value]) => {
+          if (value) {
+            filtrosLimpos[key] = value;
+          }
+        });
+
+        const livrosData = await api.livros.listar(filtrosLimpos);
         setBooks(livrosData);
       } catch (error) {
         console.error("Erro ao carregar livros:", error);
@@ -74,7 +90,7 @@ export default function AdminLivrosPage() {
     };
 
     carregarLivros();
-  }, [user, router]);
+  }, [user, router, filtrosAplicados]);
 
   const handleOpenDialog = (book = null) => {
     if (book) {
@@ -117,6 +133,23 @@ export default function AdminLivrosPage() {
     setShowDialog(false);
   };
 
+  const handleFiltroChange = (e) => {
+    const { name, value } = e.target;
+    setFiltroInputs((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleAplicarFiltros = () => {
+    setFiltrosAplicados(filtroInputs);
+  };
+
+  const handleLimparFiltros = () => {
+    setFiltroInputs({ titulo: "", autor: "", materia: "" });
+    setFiltrosAplicados({});
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -128,7 +161,7 @@ export default function AdminLivrosPage() {
         toast.success("Livro criado com sucesso!");
       }
 
-      const livrosAtualizados = await api.livros.listar();
+      const livrosAtualizados = await api.livros.listar(filtrosAplicados);
       setBooks(livrosAtualizados);
       handleCloseDialog();
     } catch (error) {
@@ -167,7 +200,7 @@ export default function AdminLivrosPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading && !showDialog) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         Carregando...
@@ -201,16 +234,83 @@ export default function AdminLivrosPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {books.map((book) => (
-          <BookCard
-            key={book.id}
-            book={book}
-            onEdit={() => handleOpenDialog(book)}
-            onDelete={() => handleDelete(book.id)}
-          />
-        ))}
-      </div>
+      <Card className="p-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Título</label>
+            <input
+              type="text"
+              name="titulo"
+              value={filtroInputs.titulo}
+              onChange={handleFiltroChange}
+              className="w-full p-2 border rounded-md"
+              placeholder="Buscar por título..."
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Autor</label>
+            <input
+              type="text"
+              name="autor"
+              value={filtroInputs.autor}
+              onChange={handleFiltroChange}
+              className="w-full p-2 border rounded-md"
+              placeholder="Buscar por autor..."
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Matéria</label>
+            <input
+              type="text"
+              name="materia"
+              value={filtroInputs.materia}
+              onChange={handleFiltroChange}
+              className="w-full p-2 border rounded-md"
+              placeholder="Buscar por matéria..."
+            />
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 mt-4">
+          <Button
+            onClick={handleLimparFiltros}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <X className="h-4 w-4" />
+            Limpar
+          </Button>
+          <Button
+            onClick={handleAplicarFiltros}
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Search className="h-4 w-4" />
+            Filtrar
+          </Button>
+        </div>
+      </Card>
+
+      {isLoading ? (
+        <div className="text-center py-12">Carregando livros...</div>
+      ) : books.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {books.map((book) => (
+            <BookCard
+              key={book.id}
+              book={book}
+              onEdit={() => handleOpenDialog(book)}
+              onDelete={() => handleDelete(book.id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-gray-500">
+            Nenhum livro encontrado com estes filtros.
+          </p>
+        </div>
+      )}
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent>

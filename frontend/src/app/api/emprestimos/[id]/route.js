@@ -1,11 +1,6 @@
-// app/api/emprestimos/[id]/route.js
-
 export async function PUT(request, { params }) {
   try {
-    // 1. O 'id' agora vem dos 'params' (da URL)
     const { id } = params;
-
-    // 2. O restante dos dados vem do 'body'
     const body = await request.json();
     const { status, data_devolucao_real } = body;
 
@@ -17,14 +12,12 @@ export async function PUT(request, { params }) {
       });
     }
 
-    // 3. O 'id' é usado na URL do fetch para o backend
     const response = await fetch(`http://localhost:8080/emprestimos/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
       },
-      // 4. O 'id' não é mais enviado no body para o backend
       body: JSON.stringify({ status, data_devolucao_real }),
     });
 

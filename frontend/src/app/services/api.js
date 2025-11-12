@@ -98,7 +98,8 @@ export const api = {
 
   // === Rotas de Usuários (Admin) ===
   usuarios: {
-    listar: () => request("/usuarios"),
+    listar: (params) =>
+      request(`/usuarios${params ? `?${new URLSearchParams(params)}` : ""}`),
     obterPorId: (id) => request(`/usuarios/${id}`),
     criar: (userData) =>
       request("/usuarios", {
@@ -118,7 +119,8 @@ export const api = {
 
   // === Rotas de Livros ===
   livros: {
-    listar: () => request("/livros"),
+    listar: (params) =>
+      request(`/livros${params ? `?${new URLSearchParams(params)}` : ""}`),
     obterPorId: (id) => request(`/livros/${id}`),
     criar: (livroData) =>
       request("/livros", {
@@ -138,7 +140,8 @@ export const api = {
 
   // === Rotas de Cursos ===
   cursos: {
-    listar: () => request("/cursos", { isPublic: true }),
+    listar: (params) =>
+      request(`/cursos${params ? `?${new URLSearchParams(params)}` : ""}`),
     obterPorId: (id) => request(`/cursos/${id}`),
     criar: (cursoData) =>
       request("/cursos", {
@@ -158,7 +161,8 @@ export const api = {
 
   // === Rotas de Exemplares ===
   exemplares: {
-    listar: () => request("/exemplares"),
+    listar: (params) =>
+      request(`/exemplares${params ? `?${new URLSearchParams(params)}` : ""}`),
     obterPorId: (id) => request(`/exemplares/${id}`),
     criar: (exemplarData) =>
       request("/exemplares", {
@@ -178,7 +182,8 @@ export const api = {
 
   // === Rotas de Empréstimos ===
   emprestimos: {
-    listar: () => request("/emprestimos"),
+    listar: (params) =>
+      request(`/emprestimos${params ? `?${new URLSearchParams(params)}` : ""}`),
     obterPorId: (id) => request(`/emprestimos/${id}`),
     criar: (emprestimoData) =>
       request("/emprestimos", {
@@ -186,7 +191,7 @@ export const api = {
         data: emprestimoData,
       }),
     atualizar: (id, emprestimoData) =>
-      request(`/sugestoes/${id}`, {
+      request(`/emprestimos/${id}`, {
         method: "PUT",
         data: emprestimoData,
       }),

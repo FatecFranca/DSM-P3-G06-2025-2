@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/contexts/AppContext";
-import { Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import LivroExemplaresCard from "@/components/cards/LivroExemplaresCard";
 import { api } from "@/app/services/api";
@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/Dialog";
+import { Card } from "@/components/ui/Card";
 
 export default function AdminExemplaresPage() {
   const router = useRouter();
@@ -28,7 +29,12 @@ export default function AdminExemplaresPage() {
     num_exemplar: "",
   });
 
-  // Carregar exemplares e livros
+  const [filtroInputs, setFiltroInputs] = useState({
+    titulo: "",
+    disponivel: "",
+  });
+  const [filtrosAplicados, setFiltrosAplicados] = useState({});
+
   useEffect(() => {
     if (!user || user.role !== "admin") {
       router.push("/");
@@ -38,9 +44,20 @@ export default function AdminExemplaresPage() {
     const carregarDados = async () => {
       try {
         setIsLoading(true);
+
+        const filtrosLivros = {};
+        if (filtrosAplicados.titulo) {
+          filtrosLivros.titulo = filtrosAplicados.titulo;
+        }
+
+        const filtrosExemplares = {};
+        if (filtrosAplicados.disponivel) {
+          filtrosExemplares.disponivel = filtrosAplicados.disponivel;
+        }
+
         const [exemplaresData, livrosData] = await Promise.all([
-          api.exemplares.listar(),
-          api.livros.listar(),
+          api.exemplares.listar(filtrosExemplares),
+          api.livros.listar(filtrosLivros),
         ]);
 
         setExemplares(exemplaresData);
@@ -54,12 +71,12 @@ export default function AdminExemplaresPage() {
     };
 
     carregarDados();
-  }, [user, router]);
+  }, [user, router, filtrosAplicados]);
 
-  // Contagem de exemplares por livro
   const exemplaresPorLivro = exemplares.reduce((acc, exemplar) => {
-    if (exemplar.id_livro) {
-      acc[exemplar.id_livro] = (acc[exemplar.id_livro] || 0) + 1;
+    const livroId = exemplar.id_livro || exemplar.livro?.id;
+    if (livroId) {
+      acc[livroId] = (acc[livroId] || 0) + 1;
     }
     return acc;
   }, {});
@@ -84,6 +101,23 @@ export default function AdminExemplaresPage() {
     }));
   };
 
+  const handleFiltroChange = (e) => {
+    const { name, value } = e.target;
+    setFiltroInputs((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleAplicarFiltros = () => {
+    setFiltrosAplicados(filtroInputs);
+  };
+
+  const handleLimparFiltros = () => {
+    setFiltroInputs({ titulo: "", disponivel: "" });
+    setFiltrosAplicados({});
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -95,14 +129,15 @@ export default function AdminExemplaresPage() {
     try {
       const dadosParaEnviar = {
         id_livro: selectedLivro.id,
-        num_exemplar: parseInt(formData.num_exemplar, 10),
+        num_exemplar: formData.num_exemplar,
       };
 
       await api.exemplares.criar(dadosParaEnviar);
       toast.success("Exemplar criado com sucesso!");
 
-      // Recarregar lista de exemplares
-      const exemplaresAtualizados = await api.exemplares.listar();
+      const exemplaresAtualizados = await api.exemplares.listar(
+        filtrosAplicados
+      );
       setExemplares(exemplaresAtualizados);
       handleCloseDialog();
     } catch (error) {
@@ -112,19 +147,22 @@ export default function AdminExemplaresPage() {
   };
 
   const handleDelete = async (livroId) => {
-    // Encontrar o exemplar mais recente deste livro
     const exemplaresDesseLivro = exemplares.filter(
-      (e) => e.id_livro === livroId
+      (e) => (e.id_livro || e.livro?.id) === livroId
     );
-    if (exemplaresDesseLivro.length === 0) return;
+    if (exemplaresDesseLivro.length === 0) {
+      toast.error("Este livro não possui exemplares (filtrados) para remover.");
+      return;
+    }
 
-    // Ordenar por número do exemplar em ordem decrescente
     const ultimoExemplar = exemplaresDesseLivro.sort(
       (a, b) => b.num_exemplar - a.num_exemplar
     )[0];
 
     if (
-      !window.confirm("Tem certeza que deseja remover um exemplar deste livro?")
+      !window.confirm(
+        `Tem certeza que deseja remover o exemplar nº ${ultimoExemplar.num_exemplar} deste livro?`
+      )
     ) {
       return;
     }
@@ -133,18 +171,17 @@ export default function AdminExemplaresPage() {
       await api.exemplares.excluir(ultimoExemplar.id);
       toast.success("Exemplar removido com sucesso!");
 
-      // Atualizar a lista de exemplares
-      const exemplaresAtualizados = exemplares.filter(
-        (e) => e.id !== ultimoExemplar.id
+      const exemplaresAtualizados = await api.exemplares.listar(
+        filtrosAplicados
       );
       setExemplares(exemplaresAtualizados);
     } catch (error) {
       console.error("Erro ao excluir exemplar:", error);
-      toast.error("Erro ao remover exemplar");
+      toast.error(error.message || "Erro ao remover exemplar");
     }
   };
 
-  if (isLoading) {
+  if (isLoading && !showDialog) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         Carregando...
@@ -168,27 +205,81 @@ export default function AdminExemplaresPage() {
         </div>
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Gerenciar Exemplares</h1>
-          <Button
-            onClick={() => handleOpenDialog()}
-            className="flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Adicionar Exemplar
-          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {livros.map((livro) => (
-          <LivroExemplaresCard
-            key={livro.id}
-            livro={livro}
-            quantidade={exemplaresPorLivro[livro.id] || 0}
-            onAdd={() => handleOpenDialog(livro)}
-            onRemove={() => handleDelete(livro.id)}
-          />
-        ))}
-      </div>
+      <Card className="p-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Título do Livro
+            </label>
+            <input
+              type="text"
+              name="titulo"
+              value={filtroInputs.titulo}
+              onChange={handleFiltroChange}
+              className="w-full p-2 border rounded-md"
+              placeholder="Filtrar livros por título..."
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Status do Exemplar
+            </label>
+            <select
+              name="disponivel"
+              value={filtroInputs.disponivel}
+              onChange={handleFiltroChange}
+              className="w-full p-2 border rounded-md"
+            >
+              <option value="">Todos</option>
+              <option value="true">Apenas Disponíveis</option>
+            </select>
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 mt-4">
+          <Button
+            onClick={handleLimparFiltros}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <X className="h-4 w-4" />
+            Limpar
+          </Button>
+          <Button
+            onClick={handleAplicarFiltros}
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Search className="h-4 w-4" />
+            Filtrar
+          </Button>
+        </div>
+      </Card>
+
+      {isLoading ? (
+        <div className="text-center py-12">Carregando...</div>
+      ) : livros.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {livros.map((livro) => (
+            <LivroExemplaresCard
+              key={livro.id}
+              livro={livro}
+              quantidade={exemplaresPorLivro[livro.id] || 0}
+              onAdd={() => handleOpenDialog(livro)}
+              onRemove={() => handleDelete(livro.id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-gray-500">
+            Nenhum livro encontrado com este filtro.
+          </p>
+        </div>
+      )}
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent>

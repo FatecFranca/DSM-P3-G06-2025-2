@@ -4,12 +4,26 @@ import prisma from "../database/client.js";
 
 // Obter todos os cursos
 export const getAllCursos = async (req, res) => {
+  const { nome } = req.query;
+
   try {
+    const where = {};
+    if (nome) {
+      where.nome = {
+        contains: nome,
+        mode: "insensitive",
+      };
+    }
+
     const cursos = await prisma.curso.findMany({
+      where,
       include: {
         _count: {
           select: { usuarios: true, livros: true },
         },
+      },
+      orderBy: {
+        nome: "asc",
       },
     });
     res.status(200).json(cursos);

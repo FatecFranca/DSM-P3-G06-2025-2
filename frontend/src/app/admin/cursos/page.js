@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, ArrowLeft } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Search, X } from "lucide-react";
 import { useApp } from "@/contexts/AppContext";
 import { api } from "@/app/services/api";
 import { Button } from "@/components/ui/Button";
@@ -28,6 +28,11 @@ export default function AdminCursosPage() {
     descricao: "",
   });
 
+  const [filtroInputs, setFiltroInputs] = useState({
+    nome: "",
+  });
+  const [filtrosAplicados, setFiltrosAplicados] = useState({});
+
   useEffect(() => {
     if (!user || user.role !== "admin") {
       router.push("/");
@@ -37,7 +42,13 @@ export default function AdminCursosPage() {
     const carregarCursos = async () => {
       try {
         setIsLoading(true);
-        const cursosData = await api.cursos.listar();
+
+        const filtrosLimpos = {};
+        if (filtrosAplicados.nome) {
+          filtrosLimpos.nome = filtrosAplicados.nome;
+        }
+
+        const cursosData = await api.cursos.listar(filtrosLimpos);
         setCursos(cursosData);
       } catch (error) {
         console.error("Erro ao carregar cursos:", error);
@@ -48,7 +59,7 @@ export default function AdminCursosPage() {
     };
 
     carregarCursos();
-  }, [user, router]);
+  }, [user, router, filtrosAplicados]);
 
   const handleOpenDialog = (cursoData = null) => {
     if (cursoData) {
@@ -81,6 +92,23 @@ export default function AdminCursosPage() {
     }));
   };
 
+  const handleFiltroChange = (e) => {
+    const { name, value } = e.target;
+    setFiltroInputs((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleAplicarFiltros = () => {
+    setFiltrosAplicados(filtroInputs);
+  };
+
+  const handleLimparFiltros = () => {
+    setFiltroInputs({ nome: "" });
+    setFiltrosAplicados({});
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -92,8 +120,7 @@ export default function AdminCursosPage() {
         toast.success("Curso criado com sucesso!");
       }
 
-      // Recarregar lista de cursos
-      const cursosAtualizados = await api.cursos.listar();
+      const cursosAtualizados = await api.cursos.listar(filtrosAplicados);
       setCursos(cursosAtualizados);
       handleCloseDialog();
     } catch (error) {
@@ -113,14 +140,14 @@ export default function AdminCursosPage() {
       setCursos(cursos.filter((c) => c.id !== cursoId));
     } catch (error) {
       console.error("Erro ao excluir curso:", error);
-      toast.error("Erro ao excluir curso");
+      toast.error(error.message || "Erro ao excluir curso");
     }
   };
 
-  if (isLoading) {
+  if (isLoading && !showDialog) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        Carregando...
+        Carregar...
       </div>
     );
   }
@@ -151,34 +178,81 @@ export default function AdminCursosPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {cursos.map((curso) => (
-          <Card key={curso.id} className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="font-semibold text-lg">{curso.nome}</h3>
+      <Card className="p-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-4 items-end">
+          <div className="flex-1 w-full">
+            <label className="block text-sm font-medium mb-1">
+              Nome do Curso
+            </label>
+            <input
+              type="text"
+              name="nome"
+              value={filtroInputs.nome}
+              onChange={handleFiltroChange}
+              className="w-full p-2 border rounded-md"
+              placeholder="Buscar por nome..."
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleLimparFiltros}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <X className="h-4 w-4" />
+              Limpar
+            </Button>
+            <Button
+              onClick={handleAplicarFiltros}
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Search className="h-4 w-4" />
+              Filtrar
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {isLoading ? (
+        <div className="text-center py-12">Carregando cursos...</div>
+      ) : cursos.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cursos.map((curso) => (
+            <Card key={curso.id} className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="font-semibold text-lg">{curso.nome}</h3>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleOpenDialog(curso)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(curso.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleOpenDialog(curso)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(curso.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600">{curso.descricao}</p>
-          </Card>
-        ))}
-      </div>
+              <p className="text-sm text-gray-600">{curso.descricao}</p>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-gray-500">
+            Nenhum curso encontrado com estes filtros.
+          </p>
+        </div>
+      )}
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent>

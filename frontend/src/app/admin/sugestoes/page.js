@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/contexts/AppContext";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import SugestaoCard from "@/components/cards/SugestaoCard";
 import { api } from "@/app/services/api";
 import { toast } from "sonner";
+import { Card } from "@/components/ui/Card";
 
 export default function AdminSugestoesPage() {
   const router = useRouter();
@@ -15,7 +16,13 @@ export default function AdminSugestoesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [sugestoes, setSugestoes] = useState([]);
 
-  // Carregar sugestões
+  const [filtroInputs, setFiltroInputs] = useState({
+    status: "pendente",
+  });
+  const [filtrosAplicados, setFiltrosAplicados] = useState({
+    status: "pendente",
+  });
+
   useEffect(() => {
     if (!user || user.role !== "admin") {
       router.push("/");
@@ -25,7 +32,13 @@ export default function AdminSugestoesPage() {
     const carregarSugestoes = async () => {
       try {
         setIsLoading(true);
-        const data = await api.sugestoes.listar({ status: "pendente" });
+
+        const filtrosLimpos = {};
+        if (filtrosAplicados.status) {
+          filtrosLimpos.status = filtrosAplicados.status;
+        }
+
+        const data = await api.sugestoes.listar(filtrosLimpos);
         setSugestoes(data);
       } catch (error) {
         console.error("Erro ao carregar sugestões:", error);
@@ -36,7 +49,24 @@ export default function AdminSugestoesPage() {
     };
 
     carregarSugestoes();
-  }, [user, router]);
+  }, [user, router, filtrosAplicados]);
+
+  const handleFiltroChange = (e) => {
+    const { name, value } = e.target;
+    setFiltroInputs((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleAplicarFiltros = () => {
+    setFiltrosAplicados(filtroInputs);
+  };
+
+  const handleLimparFiltros = () => {
+    setFiltroInputs({ status: "" });
+    setFiltrosAplicados({});
+  };
 
   const handleAprovar = async (sugestao) => {
     try {
@@ -102,9 +132,51 @@ export default function AdminSugestoesPage() {
         </div>
       </div>
 
-      {sugestoes.length === 0 ? (
+      <Card className="p-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-4 items-end">
+          <div className="flex-1 w-full">
+            <label className="block text-sm font-medium mb-1">Status</label>
+            <select
+              name="status"
+              value={filtroInputs.status}
+              onChange={handleFiltroChange}
+              className="w-full p-2 border rounded-md"
+            >
+              <option value="">Todas</option>
+              <option value="pendente">Pendentes</option>
+              <option value="aprovada">Aprovadas</option>
+              <option value="rejeitada">Rejeitadas</option>
+            </select>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleLimparFiltros}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <X className="h-4 w-4" />
+              Limpar
+            </Button>
+            <Button
+              onClick={handleAplicarFiltros}
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Search className="h-4 w-4" />
+              Filtrar
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {isLoading ? (
+        <div className="text-center py-12">Carregando sugestões...</div>
+      ) : sugestoes.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">Nenhuma sugestão de livro pendente.</p>
+          <p className="text-gray-500">
+            Nenhuma sugestão encontrada com estes filtros.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

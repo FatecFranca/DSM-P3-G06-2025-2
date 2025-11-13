@@ -1,0 +1,118 @@
+/* Animações */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Elementos do Hero */
+.heroBgImage {
+  position: fixed;
+  top: -50px;
+  left: -50px;
+  right: -50px;
+  bottom: -50px;
+  width: calc(100% + 100px);
+  height: calc(100% + 100px);
+  background-image: url('/images/fatec-franca.webp');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  opacity: 0.4;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.heroBgImage::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 50%,
+    rgba(252, 249, 243, 0.2) 65%,
+    rgba(252, 249, 243, 0.5) 75%,
+    rgba(252, 249, 243, 0.75) 82%,
+    rgba(252, 249, 243, 0.9) 88%,
+    rgba(252, 249, 243, 0.98) 94%,
+    rgba(252, 249, 243, 1) 100%
+  );
+}
+
+.heroGradient {
+  position: fixed;
+  top: -50px;
+  left: -50px;
+  right: -50px;
+  bottom: -50px;
+  width: calc(100% + 100px);
+  height: calc(100% + 100px);
+  background: linear-gradient(
+    to bottom,
+    rgba(252, 249, 243, 0.3) 0%,
+    rgba(252, 249, 243, 0.4) 50%,
+    rgba(252, 249, 243, 0.6) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Animações dos elementos */
+.heroContainer {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.card1 {
+  animation: fadeInUp 0.8s ease-out 0.2s backwards;
+}
+
+.card2 {
+  animation: fadeInUp 0.8s ease-out 0.3s backwards;
+}
+
+.card3 {
+  animation: fadeInUp 0.8s ease-out 0.4s backwards;
+}
+
+.ctaSection {
+  animation: fadeInUp 0.8s ease-out 0.5s backwards;
+}
+
+.floating {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Hero Section Responsivo */
+.heroSection {
+  min-height: 75vh;
+}
+
+@media (min-height: 800px) {
+  .heroSection {
+    min-height: 70vh;
+  }
+}
+
+@media (min-height: 1000px) {
+  .heroSection {
+    min-height: 65vh;
+  }
+}

@@ -227,10 +227,6 @@ export default function CourseDetailPage() {
               >
                 Acervo Bibliográfico
               </h2>
-              <p className="text-sm text-gray-600">
-                Explore os livros disponíveis para este curso e
-                <strong> solicite seu empréstimo</strong> com um clique.
-              </p>
             </div>
 
             <Button
@@ -273,109 +269,99 @@ export default function CourseDetailPage() {
           <div className="overflow-hidden rounded-xl border border-gray-200/50 shadow-sm">
             <Table>
               <TableHeader style={{ backgroundColor: "var(--primary-color)" }}>
-                <TableRow className="border-b-0">
+                <TableRow className="border-b-0 hover:bg-transparent">
                   <TableHead
-                    className="py-4"
+                    className="py-5 px-6 text-left font-semibold text-sm tracking-wide"
                     style={{ color: "var(--text-color-light)" }}
                   >
                     Livro
                   </TableHead>
                   <TableHead
-                    className="py-4"
+                    className="py-5 px-6 text-left font-semibold text-sm tracking-wide"
                     style={{ color: "var(--text-color-light)" }}
                   >
                     Autor
                   </TableHead>
                   <TableHead
-                    className="py-4"
+                    className="py-5 px-6 text-left font-semibold text-sm tracking-wide"
                     style={{ color: "var(--text-color-light)" }}
                   >
                     Editora
                   </TableHead>
                   <TableHead
-                    className="py-4"
+                    className="py-5 px-6 text-left font-semibold text-sm tracking-wide"
                     style={{ color: "var(--text-color-light)" }}
                   >
                     Edição
                   </TableHead>
                   <TableHead
-                    className="py-4"
+                    className="py-5 px-6 text-left font-semibold text-sm tracking-wide"
                     style={{ color: "var(--text-color-light)" }}
                   >
                     Status
                   </TableHead>
-                  {user?.role === "user" && (
-                    <TableHead
-                      className="py-4"
-                      style={{ color: "var(--text-color-light)" }}
-                    >
-                      Ação
-                    </TableHead>
-                  )}
+                  <TableHead
+                    className="py-5 px-6 text-center font-semibold text-sm tracking-wide"
+                    style={{ color: "var(--text-color-light)" }}
+                  >
+                    Ações
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredBooks.map((book) => (
                   <TableRow
                     key={book.id}
-                    className="hover:bg-gray-50/50 transition-colors cursor-pointer"
-                    onClick={() => router.push(`/livros/${book.id}`)}
+                    className="hover:bg-blue-50/30 hover:border-l-4 hover:border-l-primary transition-all duration-200 group border-b border-gray-100"
                   >
-                    <TableCell className="font-medium py-4">
+                    <TableCell className="font-medium py-5 px-6 group-hover:text-primary transition-colors">
                       {book.titulo}
                     </TableCell>
-                    <TableCell className="py-4 text-gray-600">
+                    <TableCell className="py-5 px-6 text-gray-600">
                       {book.autor}
                     </TableCell>
-                    <TableCell className="py-4 text-gray-600">
+                    <TableCell className="py-5 px-6 text-gray-600">
                       {book.editora}
                     </TableCell>
-                    <TableCell className="py-4 text-gray-600">
+                    <TableCell className="py-5 px-6 text-gray-600">
                       {book.edicao}
                     </TableCell>
-                    <TableCell className="py-4">
+                    <TableCell className="py-5 px-6">
                       <Badge
                         variant={
                           book.disponibilidade ? "default" : "destructive"
                         }
                         className={
                           book.disponibilidade
-                            ? "bg-green-100 text-green-700 hover:bg-green-100 shadow-sm"
-                            : "shadow-sm"
+                            ? "bg-green-100 text-green-700 hover:bg-green-100 shadow-sm font-medium"
+                            : "shadow-sm font-medium"
                         }
                       >
                         {book.disponibilidade ? "Disponível" : "Indisponível"}
                       </Badge>
                     </TableCell>
-                    {user?.role === "user" && (
-                      <TableCell className="py-4">
+                    <TableCell className="py-5 px-6">
+                      <div className="flex items-center justify-center gap-2">
                         <Button
                           size="sm"
+                          variant="outline"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleLoanRequest(book);
+                            router.push(`/livros/${book.id}`);
                           }}
-                          disabled={!book.disponibilidade}
-                          className="rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
-                          style={{
-                            backgroundColor: book.disponibilidade
-                              ? "var(--primary-color)"
-                              : undefined,
-                            color: book.disponibilidade
-                              ? "var(--text-color-light)"
-                              : undefined,
-                          }}
+                          className="rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border-primary/20 hover:border-primary hover:bg-primary hover:text-white group-hover:scale-105 font-medium"
                         >
-                          {book.disponibilidade ? "Empréstimo" : "Indisponível"}
+                          <BookOpen className="h-4 w-4 mr-1" />
+                          Solicitar Empréstimo
                         </Button>
-                      </TableCell>
-                    )}
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
                 {filteredBooks.length === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={user?.role === "user" ? 6 : 5}
+                      colSpan={6}
                       className="text-center py-12"
                     >
                       <div className="space-y-2">

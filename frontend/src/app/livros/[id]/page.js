@@ -20,6 +20,7 @@ export default function LivroDetailPage() {
   const [error, setError] = useState(null);
   const [showEmprestimoDialog, setShowEmprestimoDialog] = useState(false);
   const [selectedExemplar, setSelectedExemplar] = useState(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   useEffect(() => {
     const fetchLivro = async () => {
@@ -126,57 +127,71 @@ export default function LivroDetailPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Button variant="ghost" className="mb-6" onClick={() => router.back()}>
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <Button 
+        variant="ghost" 
+        className="mb-6 hover:bg-gray-100 transition-colors" 
+        onClick={() => router.back()}
+      >
         <ChevronLeft className="h-4 w-4 mr-2" />
         Voltar
       </Button>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-8 md:grid-cols-3">
         {/* Informações Principais */}
-        <Card className="md:col-span-2 p-6">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h1 className="text-2xl font-bold mb-2">{livro.titulo}</h1>
-              <p className="text-lg text-gray-600">{livro.autor}</p>
+        <Card className="md:col-span-2 p-8 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold mb-2 text-gray-900">{livro.titulo}</h1>
+              <p className="text-lg text-gray-600">por {livro.autor}</p>
             </div>
-            <Badge variant={livro.disponibilidade ? "success" : "destructive"}>
+            <Badge 
+              variant={livro.disponibilidade ? "default" : "destructive"}
+              className={livro.disponibilidade 
+                ? "bg-green-50 text-green-700 border border-green-200 font-medium px-4 py-1.5" 
+                : "font-medium px-4 py-1.5"
+              }
+            >
               {livro.disponibilidade ? "Disponível" : "Indisponível"}
             </Badge>
           </div>
 
-          <div className="grid gap-4 mb-6">
-            <div>
-              <h3 className="text-sm font-medium text-gray-500">Editora</h3>
-              <p>{livro.editora}</p>
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div className="space-y-1">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Editora</h3>
+              <p className="text-gray-900 font-medium">{livro.editora}</p>
             </div>
-            <div>
-              <h3 className="text-sm font-medium text-gray-500">Edição</h3>
-              <p>{livro.edicao}</p>
+            <div className="space-y-1">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Edição</h3>
+              <p className="text-gray-900 font-medium">{livro.edicao}</p>
             </div>
-            <div>
-              <h3 className="text-sm font-medium text-gray-500">Matéria</h3>
-              <p>{livro.materia}</p>
+            <div className="space-y-1">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Matéria</h3>
+              <p className="text-gray-900 font-medium">{livro.materia}</p>
             </div>
             {livro.curso && (
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Curso</h3>
+              <div className="space-y-1">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Curso</h3>
                 <div className="flex items-center gap-2">
-                  <GraduationCap className="h-4 w-4 text-gray-400" />
-                  <p>{livro.curso.nome}</p>
+                  <GraduationCap className="h-4 w-4 text-primary" />
+                  <p className="text-gray-900 font-medium">{livro.curso.nome}</p>
                 </div>
               </div>
             )}
           </div>
 
           {livro.palavras_chave && livro.palavras_chave.length > 0 && (
-            <div className="border-t pt-4">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">
+            <div className="border-t border-gray-200 pt-6">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
                 Palavras-chave
               </h3>
               <div className="flex flex-wrap gap-2">
                 {livro.palavras_chave.map((palavra, index) => (
-                  <Badge key={index} variant="secondary">
+                  <Badge 
+                    key={index} 
+                    variant="secondary"
+                    className="bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors font-medium"
+                  >
                     {palavra}
                   </Badge>
                 ))}
@@ -186,37 +201,68 @@ export default function LivroDetailPage() {
         </Card>
 
         {/* Card de Empréstimo */}
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Solicitar Empréstimo</h2>
+        <Card className="p-6 border border-gray-200 shadow-sm h-fit sticky top-8">
+          <h2 className="text-xl font-bold mb-6 text-gray-900">Solicitar Empréstimo</h2>
 
           {livro.disponibilidade ? (
             <>
               <div className="space-y-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-400" />
-                  <p className="text-sm text-gray-600">
-                    Prazo de devolução: 15 dias
-                  </p>
+                <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                  <Calendar className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">Prazo de devolução</p>
+                    <p className="text-sm text-blue-700">15 dias corridos</p>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600">
-                  Ao solicitar o empréstimo, você concorda com os termos da
-                  biblioteca.
-                </p>
+
+                {/* Checkbox de Termos */}
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <label className="flex items-start gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={acceptedTerms}
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-2 cursor-pointer"
+                    />
+                    <span className="text-sm text-gray-700 leading-relaxed group-hover:text-gray-900 transition-colors">
+                      Concordo com os <strong>termos da biblioteca</strong> e me comprometo a devolver o livro no prazo estabelecido.
+                    </span>
+                  </label>
+                </div>
               </div>
 
-              <Button className="w-full" onClick={handleSolicitarEmprestimo}>
-                Solicitar Empréstimo
+              <Button 
+                className="w-full font-medium shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
+                onClick={handleSolicitarEmprestimo}
+                disabled={!acceptedTerms}
+                style={{
+                  backgroundColor: acceptedTerms ? "var(--primary-color)" : undefined,
+                  color: acceptedTerms ? "var(--text-color-light)" : undefined,
+                }}
+              >
+                <BookOpen className="h-4 w-4 mr-2" />
+                Confirmar Empréstimo
               </Button>
+
+              {!acceptedTerms && (
+                <p className="text-xs text-gray-500 text-center mt-3">
+                  É necessário aceitar os termos para continuar
+                </p>
+              )}
             </>
           ) : (
-            <div className="text-center space-y-2">
-              <BookOpen className="h-8 w-8 mx-auto text-gray-400" />
-              <p className="text-gray-600">
-                Este livro não está disponível no momento.
-              </p>
-              <p className="text-sm text-gray-500">
-                Tente novamente mais tarde ou explore outros títulos.
-              </p>
+            <div className="text-center space-y-3 py-6">
+              <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
+                <BookOpen className="h-8 w-8 text-gray-400" />
+              </div>
+              <div>
+                <p className="text-gray-900 font-medium mb-1">
+                  Livro indisponível
+                </p>
+                <p className="text-sm text-gray-600">
+                  Tente novamente mais tarde ou explore outros títulos.
+                </p>
+              </div>
             </div>
           )}
         </Card>

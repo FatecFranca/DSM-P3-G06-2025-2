@@ -25,18 +25,15 @@ const formatarData = (dataString) => {
 };
 
 export default function EmprestimoCard({ emprestimo, onFinalize }) {
-  const status = emprestimo.data_devolucao
-    ? "devolvido"
-    : new Date(emprestimo.data_prevista) < new Date()
-    ? "atrasado"
-    : "ativo";
+  const status = emprestimo.status || "ativo";
 
   const getStatusColor = () => {
     switch (status) {
-      case "devolvido":
+      case "concluido":
         return "bg-green-100 text-green-800";
       case "atrasado":
         return "bg-red-100 text-red-800";
+      case "ativo":
       default:
         return "bg-blue-100 text-blue-800";
     }
@@ -92,7 +89,7 @@ export default function EmprestimoCard({ emprestimo, onFinalize }) {
             {status.charAt(0).toUpperCase() + status.slice(1)}
           </Badge>
 
-          {status === "ativo" && (
+          {(status === "ativo" || status === "atrasado") && (
             <Button
               variant="ghost"
               size="sm"

@@ -19,9 +19,11 @@ export default function AdminEmprestimosPage() {
   const [filtroInputs, setFiltroInputs] = useState({
     userName: "",
     bookTitle: "",
-    status: "",
+    status: "ativo",
   });
-  const [filtrosAplicados, setFiltrosAplicados] = useState({});
+  const [filtrosAplicados, setFiltrosAplicados] = useState({
+    status: "ativo",
+  });
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -66,8 +68,10 @@ export default function AdminEmprestimosPage() {
   };
 
   const handleLimparFiltros = () => {
-    setFiltroInputs({ userName: "", bookTitle: "", status: "" });
-    setFiltrosAplicados({});
+    const inputsLimpos = { userName: "", bookTitle: "", status: "" };
+    setFiltroInputs(inputsLimpos);
+
+    setFiltrosAplicados(inputsLimpos);
   };
 
   const handleFinalize = async (id) => {
@@ -167,7 +171,7 @@ export default function AdminEmprestimosPage() {
             className="flex items-center gap-2"
           >
             <X className="h-4 w-4" />
-            Limpar
+            Limpar (Ver Todos)
           </Button>
           <Button
             onClick={handleAplicarFiltros}

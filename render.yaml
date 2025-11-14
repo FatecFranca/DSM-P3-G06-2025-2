@@ -1,7 +1,7 @@
 services:
   # Backend Service
   - type: web
-    name: biblioteca-backend
+    name: openpages-backend
     runtime: node
     rootDir: backend
     buildCommand: npm install && npm run build
@@ -18,7 +18,7 @@ services:
 
   # Frontend Service
   - type: web
-    name: biblioteca-frontend
+    name: openpages-frontend
     runtime: node
     rootDir: frontend
     buildCommand: npm install && npm run build
@@ -27,4 +27,4 @@ services:
       - key: NODE_ENV
         value: production
       - key: NEXT_PUBLIC_API_URL
-        value: https://biblioteca-backend.onrender.com
+        value: https://openpages-backend.onrender.com

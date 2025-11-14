@@ -137,3 +137,13 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Environment Variables - NÃO COMMITAR
+.env
+.env*.local
+.env.production
+backend/.env*
+frontend/.env*
+
+# Prisma Generated Files
+backend/src/generated/

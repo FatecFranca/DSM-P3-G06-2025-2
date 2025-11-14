@@ -218,7 +218,7 @@ export default function AdminCursosPage() {
       {isLoading ? (
         <div className="text-center py-12">Carregando cursos...</div>
       ) : cursos.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {cursos.map((curso) => (
             <Card key={curso.id} className="p-6">
               <div className="flex justify-between items-start mb-4">

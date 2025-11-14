@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/Card";
 
 export default function AboutPage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 px-4 sm:px-6">
       {/* Hero Section */}
       <div className="text-center space-y-6">
         <div className="flex justify-center">
@@ -15,12 +15,12 @@ export default function AboutPage() {
             alt="OpenPages Logo"
             width={220}
             height={50}
-            className="h-14 w-auto"
+            className="h-12 sm:h-14 w-auto"
             priority
           />
         </div>
         <div className="space-y-4">
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto px-2">
             Plataforma de livros acadêmicos da FATEC que conecta estudantes aos
             recursos bibliográficos essenciais para sua formação acadêmica.
           </p>
@@ -28,7 +28,7 @@ export default function AboutPage() {
       </div>
 
       {/* Mission Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
         <Card className="p-6 space-y-4 text-center border-gray-200 bg-white">
           <div className="flex justify-center">
             <Target

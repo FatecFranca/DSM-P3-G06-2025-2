@@ -172,7 +172,7 @@ export default function CourseDetailPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8 px-4 sm:px-0">
       {/* Back Button */}
       <button
         onClick={() => router.push("/courses")}
@@ -183,11 +183,11 @@ export default function CourseDetailPage() {
       </button>
 
       {/* Course Info - Hero Style */}
-      <div className="bg-gradient-to-br from-white to-gray-50/50 p-8 md:p-12 rounded-3xl border border-gray-200/50 shadow-sm">
-        <div className="text-center space-y-6">
+      <div className="bg-gradient-to-br from-white to-gray-50/50 p-6 sm:p-8 md:p-12 rounded-2xl sm:rounded-3xl border border-gray-200/50 shadow-sm">
+        <div className="text-center space-y-4 sm:space-y-6">
           <div className="space-y-3">
             <h1
-              className="text-3xl md:text-4xl font-medium tracking-tight"
+              className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tight px-2 break-words"
               style={{ color: "var(--title-color)" }}
             >
               {course.nome}

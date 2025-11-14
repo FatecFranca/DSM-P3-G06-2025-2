@@ -127,23 +127,23 @@ export default function LivroDetailPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-6xl">
       <Button 
         variant="ghost" 
-        className="mb-6 hover:bg-gray-100 transition-colors" 
+        className="mb-4 sm:mb-6 hover:bg-gray-100 transition-colors" 
         onClick={() => router.back()}
       >
         <ChevronLeft className="h-4 w-4 mr-2" />
         Voltar
       </Button>
 
-      <div className="grid gap-8 md:grid-cols-3">
+      <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
         {/* Informações Principais */}
-        <Card className="md:col-span-2 p-8 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex justify-between items-start mb-6">
+        <Card className="md:col-span-2 p-6 sm:p-8 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-2 text-gray-900">{livro.titulo}</h1>
-              <p className="text-lg text-gray-600">por {livro.autor}</p>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-gray-900">{livro.titulo}</h1>
+              <p className="text-base sm:text-lg text-gray-600">por {livro.autor}</p>
             </div>
             <Badge 
               variant={livro.disponibilidade ? "default" : "destructive"}
@@ -156,7 +156,7 @@ export default function LivroDetailPage() {
             </Badge>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
             <div className="space-y-1">
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Editora</h3>
               <p className="text-gray-900 font-medium">{livro.editora}</p>

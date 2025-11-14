@@ -102,28 +102,28 @@ export default function AdminEmprestimosPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col gap-4 mb-8">
-        <div className="flex items-center gap-4">
+    <div className="container mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+      <div className="flex flex-col gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="flex items-center gap-2 sm:gap-4">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => router.push("/admin")}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1.5 sm:gap-2 text-sm"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Voltar
           </Button>
         </div>
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Gerenciar Empréstimos</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold truncate">Gerenciar Empréstimos</h1>
         </div>
       </div>
 
-      <Card className="p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Card className="p-3 sm:p-4 mb-4 sm:mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-xs sm:text-sm font-medium mb-1">
               Nome do Usuário
             </label>
             <input

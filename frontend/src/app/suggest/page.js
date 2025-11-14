@@ -82,20 +82,20 @@ export default function SuggestPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 px-4 sm:px-6">
       <div className="text-center space-y-2">
         <h2
-          className="text-2xl font-medium"
+          className="text-xl sm:text-2xl font-medium"
           style={{ color: "var(--title-color)" }}
         >
           Sugira um Livro
         </h2>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Ajude a expandir nossa biblioteca acadêmica sugerindo novos livros
         </p>
       </div>
 
-      <Card className="p-8 bg-white border border-gray-200 shadow-sm">
+      <Card className="p-6 sm:p-8 bg-white border border-gray-200 shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Book Name */}
           <div className="space-y-2">

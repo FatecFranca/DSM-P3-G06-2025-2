@@ -165,29 +165,29 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center py-12 px-4"
+      className="min-h-screen flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6"
       style={{ backgroundColor: "var(--background-color)" }}
     >
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-md space-y-6 sm:space-y-8">
         {/* Logo and Title */}
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-3 sm:space-y-4">
           <div className="flex justify-center">
             <Image
               src="/logo/Logo - OpenPages.svg"
               alt="OpenPages Logo"
               width={200}
               height={45}
-              className="h-10 w-auto"
+              className="h-8 sm:h-10 w-auto"
               priority
             />
           </div>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             Plataforma de Livros Acadêmicos - FATEC
           </p>
         </div>
 
         {/* Auth Form */}
-        <Card className="p-8 bg-white border border-gray-200 shadow-sm">
+        <Card className="p-6 sm:p-8 bg-white border border-gray-200 shadow-sm">
           <Tabs defaultValue="login" className="space-y-6">
             <TabsList
               className="grid w-full grid-cols-2 rounded-lg"

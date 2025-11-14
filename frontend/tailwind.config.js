@@ -15,6 +15,9 @@ module.exports = {
       },
     },
     extend: {
+      screens: {
+        'xs': '475px', // Breakpoint extra small para telas entre 320px e 640px
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

@@ -49,17 +49,17 @@ export default function EmprestimoCard({ emprestimo, onFinalize }) {
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex justify-between items-start">
-        <div className="space-y-3">
+    <Card className="p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+        <div className="space-y-3 min-w-0 flex-1">
           <div>
-            <h3 className="font-semibold text-lg">{emprestimo.usuario.nome}</h3>
-            <p className="text-sm text-gray-600">{emprestimo.usuario.email}</p>
+            <h3 className="font-semibold text-base sm:text-lg truncate" title={emprestimo.usuario.nome}>{emprestimo.usuario.nome}</h3>
+            <p className="text-xs sm:text-sm text-gray-600 truncate" title={emprestimo.usuario.email}>{emprestimo.usuario.email}</p>
           </div>
 
           <div>
-            <h4 className="font-medium">Livro</h4>
-            <p className="text-sm text-gray-600">{emprestimo.livro?.titulo}</p>
+            <h4 className="font-medium text-sm">Livro</h4>
+            <p className="text-xs sm:text-sm text-gray-600 line-clamp-2" title={emprestimo.livro?.titulo}>{emprestimo.livro?.titulo}</p>
             <p className="text-xs text-gray-500">
               Exemplar #{emprestimo.exemplar?.num_exemplar}
             </p>

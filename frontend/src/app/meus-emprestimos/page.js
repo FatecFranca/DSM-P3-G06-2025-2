@@ -82,11 +82,11 @@ export default function MeusEmprestimosPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-5xl">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
-          <h1 className="text-3xl font-bold text-gray-900">Meus Empréstimos</h1>
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Meus Empréstimos</h1>
           <Link href="/courses">
             <Button 
               variant="outline" 

@@ -18,13 +18,16 @@ export async function GET(request, { params: { id } }) {
       );
     }
 
-    const response = await fetch(`http://localhost:8080/livros/${id}`, {
-      method: "GET",
-      headers: {
-        "Authorization": token,
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `https://openpages-backend.onrender.com/livros/${id}`,
+      {
+        method: "GET",
+        headers: {
+          "Authorization": token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     const data = await response.json();
 

@@ -11,7 +11,7 @@ export async function GET(request) {
       });
     }
 
-    let url = `http://localhost:8080/exemplares?livroId=${livroId}`;
+    let url = `https://openpages-backend.onrender.com/exemplares?livroId=${livroId}`;
     if (disponivel) {
       url += "&disponivel=true";
     }

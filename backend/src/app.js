@@ -29,7 +29,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://localhost:8080/api-docs", // Rota do Swagger UI
+        url: "https://openpages-backend.onrender.com/api-docs", // Rota do Swagger UI
       },
     ],
     components: {
@@ -59,7 +59,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://open-pages.onrender.com",
-      process.env.FRONTEND_URL
+      process.env.FRONTEND_URL,
     ].filter(Boolean),
     credentials: true,
   })

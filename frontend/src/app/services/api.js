@@ -1,4 +1,5 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://openpages-backend.onrender.com";
 
 const getToken = () => {
   if (typeof window !== "undefined") {

@@ -10,14 +10,17 @@ export async function POST(request) {
       });
     }
 
-    const response = await fetch("http://localhost:8080/emprestimos", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify({ exemplarId, data_devolucao_prevista }),
-    });
+    const response = await fetch(
+      "https://openpages-backend.onrender.com/emprestimos",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ exemplarId, data_devolucao_prevista }),
+      }
+    );
 
     const data = await response.json();
 
@@ -48,8 +51,8 @@ export async function GET(request) {
     }
 
     const url = meusEmprestimos
-      ? "http://localhost:8080/emprestimos/meusEmprestimos"
-      : "http://localhost:8080/emprestimos";
+      ? "https://openpages-backend.onrender.com/emprestimos/meusEmprestimos"
+      : "https://openpages-backend.onrender.com/emprestimos";
 
     const response = await fetch(url, {
       headers: {

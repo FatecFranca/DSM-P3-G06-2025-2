@@ -58,7 +58,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://openpages-frontend.onrender.com",
+      "https://open-pages.onrender.com",
       process.env.FRONTEND_URL
     ].filter(Boolean),
     credentials: true,

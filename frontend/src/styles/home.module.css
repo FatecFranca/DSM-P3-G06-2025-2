@@ -19,57 +19,47 @@
   }
 }
 
-/* Elementos do Hero */
-.heroBgImage {
-  position: fixed;
-  top: -50px;
-  left: -50px;
-  right: -50px;
-  bottom: -50px;
-  width: calc(100% + 100px);
-  height: calc(100% + 100px);
+/* Hero Section com Imagem de Fundo */
+.heroSection {
+  position: relative;
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+.heroSection::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image: url('/images/fatec-franca.webp');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
   opacity: 0.4;
   z-index: 0;
-  pointer-events: none;
 }
 
-.heroBgImage::after {
+.heroSection::after {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: 0;
+  inset: 0;
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    transparent 50%,
-    rgba(252, 249, 243, 0.2) 65%,
-    rgba(252, 249, 243, 0.5) 75%,
-    rgba(252, 249, 243, 0.75) 82%,
-    rgba(252, 249, 243, 0.9) 88%,
-    rgba(252, 249, 243, 0.98) 94%,
-    rgba(252, 249, 243, 1) 100%
-  );
-}
-
-.heroGradient {
-  position: fixed;
-  top: -50px;
-  left: -50px;
-  right: -50px;
-  bottom: -50px;
-  width: calc(100% + 100px);
-  height: calc(100% + 100px);
-  background: linear-gradient(
-    to bottom,
-    rgba(252, 249, 243, 0.3) 0%,
-    rgba(252, 249, 243, 0.4) 50%,
-    rgba(252, 249, 243, 0.6) 100%
+    transparent 20%,
+    rgba(252, 249, 243, 0.05) 35%,
+    rgba(252, 249, 243, 0.15) 45%,
+    rgba(252, 249, 243, 0.3) 55%,
+    rgba(252, 249, 243, 0.5) 65%,
+    rgba(252, 249, 243, 0.7) 72%,
+    rgba(252, 249, 243, 0.85) 80%,
+    rgba(252, 249, 243, 0.93) 87%,
+    rgba(252, 249, 243, 0.97) 93%,
+    rgba(252, 249, 243, 1) 98%
   );
   z-index: 1;
   pointer-events: none;
@@ -100,19 +90,21 @@
   animation: float 3s ease-in-out infinite;
 }
 
-/* Hero Section Responsivo */
-.heroSection {
-  min-height: 75vh;
-}
-
+/* Media Queries para Hero Section */
 @media (min-height: 800px) {
   .heroSection {
-    min-height: 70vh;
+    min-height: 80vh;
   }
 }
 
 @media (min-height: 1000px) {
   .heroSection {
-    min-height: 65vh;
+    min-height: 75vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .heroSection {
+    min-height: 90vh;
   }
 }

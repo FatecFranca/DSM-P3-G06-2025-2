@@ -3,38 +3,19 @@
 import { useApp } from "@/contexts/AppContext";
 import { useRouter } from "next/navigation";
 import { BookOpen, Lightbulb, GraduationCap } from "lucide-react";
-import { useEffect, useState } from "react";
 import styles from "@/styles/home.module.css";
 
 export default function HomePage() {
   const { user } = useApp();
   const router = useRouter();
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   if (!user) return null;
 
   return (
-    <div className="space-y-20">
-        {/* Hero Section */}
-        <div 
-          className={`${styles.heroContainer} ${styles.heroSection} relative flex items-center justify-center text-center px-4 py-20`}
-          style={{
-            transform: `translateY(${scrollY * 0.3}px)`,
-          }}
-        >
-          <div className={styles.heroBgImage}></div>
-          <div className={styles.heroGradient}></div>
-          
-          <div className="relative z-10 max-w-5xl mx-auto space-y-10">
+    <>
+      {/* Hero Section - Full Width sem container */}
+      <div className={`${styles.heroContainer} ${styles.heroSection} relative text-center px-4 py-20 -mx-6 -mt-8`}>
+        <div className="relative z-10 max-w-5xl mx-auto space-y-10">
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight text-[#34362d]">
               Bem-vindo ao
               <br />
@@ -78,8 +59,10 @@ export default function HomePage() {
           </div>
         </div>
 
+      {/* Conteúdo com Container - Volta para dentro do container */}
+      <div className="container mx-auto px-6">
         {/* Main Features */}
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto py-20">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className={`${styles.card1} group`}>
             <div className="bg-white/80 backdrop-blur-sm p-10 rounded-3xl border border-gray-200/50 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 text-center space-y-6 h-full">
@@ -134,7 +117,7 @@ export default function HomePage() {
         </div>
 
         {/* Call to Action */}
-        <div className={`${styles.ctaSection} max-w-5xl mx-auto px-4 pb-16`}>
+        <div className={`${styles.ctaSection} max-w-5xl mx-auto pb-16`}>
           <div className="relative overflow-hidden bg-white/80 backdrop-blur-sm p-16 rounded-3xl border border-gray-200/50 shadow-xl text-center space-y-8">
             <div className="space-y-6">
               <h3 className="text-4xl md:text-5xl font-bold text-[#34362d]">
@@ -167,5 +150,6 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+    </>
   );
 }

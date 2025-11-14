@@ -19,25 +19,30 @@ export default function LivroExemplaresCard({
             Quantidade de exemplares: {quantidade}
           </p>
         </div>
+
+        {/* Container dos botões */}
         <div className="flex gap-2">
+          {/* Botão Adicionar */}
           <Button
             variant="outline"
             size="sm"
             onClick={onAdd}
-            className="flex items-center gap-2"
+            className="flex items-center gap-0 sm:gap-2"
           >
             <Plus className="h-4 w-4" />
-            Adicionar
+            <span className="hidden sm:inline">Adicionar</span>
           </Button>
+
+          {/* Botão Remover */}
           {quantidade > 0 && (
             <Button
               variant="ghost"
               size="sm"
               onClick={onRemove}
-              className="flex items-center gap-2 text-red-600 hover:text-red-700"
+              className="flex items-center gap-0 sm:gap-2 text-red-600 hover:text-red-700"
             >
               <Trash2 className="h-4 w-4" />
-              Remover
+              <span className="hidden sm:inline">Remover</span>
             </Button>
           )}
         </div>
